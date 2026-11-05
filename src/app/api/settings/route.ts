@@ -138,19 +138,38 @@ export async function POST(req: NextRequest) {
         status: 'completed'
       };
 
+      if (webhookUrl.includes('/dev')) {
+        return NextResponse.json({
+          success: false,
+          error: "Your Google Sheet Webhook URL ends in '/dev'. Google blocks external API calls to '/dev' test URLs with HTTP 401. Please use the Production Web App URL ending in '/exec' (in Apps Script: click Deploy > Manage deployments > copy the Web app URL ending in /exec)."
+        }, { status: 400 });
+      }
+
       const res = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testPayload)
+        headers: { 
+          'Content-Type': 'text/plain;charset=utf-8' 
+        },
+        body: JSON.stringify(testPayload),
+        redirect: 'follow'
       });
 
+      if (res.status === 401 || res.status === 403) {
+        throw new Error(
+          "Google Apps Script returned HTTP 401 Unauthorized. " +
+          "This happens when 'Who has access' was not set to 'Anyone' during deployment. " +
+          "Fix in 30 seconds: Open your Google Sheet > Extensions > Apps Script > Deploy > Manage deployments > " +
+          "click Edit (pencil icon) > Under 'Who has access', change it from 'Only myself' to 'Anyone' > click Deploy."
+        );
+      }
+
       if (!res.ok) {
-        throw new Error(`Webhook returned HTTP error status ${res.status}`);
+        throw new Error(`Google Sheet Webhook returned HTTP error status ${res.status}. Please check your script deployment.`);
       }
 
       return NextResponse.json({
         success: true,
-        message: 'Successfully connected and inserted a test verification row in your Google Sheet!'
+        message: 'Successfully connected and inserted a test verification row in your Google Sheet (IST)!'
       });
     }
 

@@ -6,6 +6,7 @@ import { addBatchIfNew } from '@/lib/batchService';
 import { BookingRecord } from '@/lib/types';
 import { PW_GLOBAL_DEFAULT_SUPPORT_EMAIL } from '@/lib/constants';
 import { getNowIST } from '@/lib/timeUtils';
+import { encodeBookingToken } from '@/lib/tokenUtils';
 
 function generateBookingId(): string {
   const random = Math.floor(1000 + Math.random() * 9000);
@@ -135,6 +136,11 @@ export async function POST(req: NextRequest) {
         support: false,
       }
     };
+
+    // Ensure token is a self-contained, stateless compressed token so parent links never fail on Vercel
+    if (!body.token) {
+      booking.token = encodeBookingToken(booking);
+    }
 
     const host = req.headers.get('host') || 'localhost:3000';
     const proto = req.headers.get('x-forwarded-proto') || 'http';

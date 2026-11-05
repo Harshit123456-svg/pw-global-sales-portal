@@ -4,31 +4,48 @@ export const GOOGLE_APPS_SCRIPT_TEMPLATE = `
  * PHYSICSWALLAH GLOBAL - ADMISSIONS & SALES GOOGLE SHEET INTEGRATION (IST + AUDIT)
  * ==============================================================================
  * 
- * INSTRUCTIONS:
+ * INSTRUCTIONS TO DEPLOY:
  * 1. Open Google Sheets (https://sheets.new) in your Google account.
  * 2. Name your sheet: "PW Global - Admissions Master Sheet".
  * 3. Click "Extensions" > "Apps Script".
  * 4. Select all existing text in the editor, delete it, and paste this entire code.
  * 5. Click "Deploy" (blue button at top right) > "New deployment".
- * 6. Click the gear icon next to "Select type", and choose "Web app".
- * 7. Set:
+ * 6. Click the gear icon (⚙️) next to "Select type", and choose "Web app".
+ * 7. Configure EXACTLY as follows:
  *    - Description: "PW Global Sales Webhook"
  *    - Execute as: "Me"
- *    - Who has access: "Anyone" (Required for webhooks)
- * 8. Click "Deploy" > Authorize access > Copy the "Web app URL".
- * 9. Paste the Web app URL in your PW Global Portal Settings and click "Test Google Sheet"!
+ *    - Who has access: "Anyone" (⚠️ CRITICAL: Must be "Anyone", NOT "Only myself" or restricted to domain to prevent HTTP 401)
+ * 8. Click "Deploy" > Click "Authorize access" > Choose your Google account > 
+ *    Click "Advanced" > Click "Go to PW Global Sales Webhook (unsafe)" > Click "Allow".
+ * 9. Copy the "Web app URL" (⚠️ Must end with "/exec", do NOT copy the "/dev" test URL).
+ * 10. Paste into PW Global Portal Settings and click "Test & Save Connection"!
  * 
  * FEATURES:
  * - Timestamps are automatically converted & saved in Indian Standard Time (IST - UTC+05:30).
- * - Automatic Sorting: The newest admissions are always kept at the top of the sheet!
- * - Authenticity Audit: Highlights whether the parent genuinely signed from their own device
+ * - Automatic Sorting: The newest admissions are always kept at the top of the sheet (Row 2)!
+ * - Authenticity Audit: Highlights whether the parent genuinely signed from their own mobile device
  *   or if it was submitted from the counsellor's machine.
  */
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "ok",
+    result: "success",
+    message: "PhysicsWallah Global Admissions Webhook is ONLINE, HEALTHY & ACCESSIBLE!",
+    timestampIST: Utilities.formatDate(new Date(), "Asia/Kolkata", "dd/MM/yyyy, hh:mm:ss a 'IST'")
+  })).setMimeType(ContentService.MimeType.JSON);
+}
 
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var data = JSON.parse(e.postData.contents);
+    var data = {};
+    
+    if (e.postData && e.postData.contents) {
+      data = JSON.parse(e.postData.contents);
+    } else if (e.parameter) {
+      data = e.parameter;
+    }
     
     // Auto-create header row if sheet is empty
     if (sheet.getLastRow() === 0) {

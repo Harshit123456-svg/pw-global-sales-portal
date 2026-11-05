@@ -76,15 +76,27 @@ export async function syncBookingToGoogleSheet(booking: BookingRecord): Promise<
     };
   }
 
+  if (webhookUrl.includes('/dev')) {
+    return {
+      synced: false,
+      error: "Google Sheet URL ends in '/dev'. Use the production URL ending in '/exec' from Deploy > Manage deployments."
+    };
+  }
+
   try {
     const payload = formatBookingForGoogleSheet(booking);
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain;charset=utf-8'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      redirect: 'follow'
     });
+
+    if (response.status === 401 || response.status === 403) {
+      throw new Error("Google returned HTTP 401. In Apps Script, set 'Who has access' to 'Anyone' in Deploy > Manage deployments.");
+    }
 
     if (!response.ok) {
       throw new Error(`Google Sheet Webhook returned HTTP ${response.status}`);

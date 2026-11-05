@@ -40,9 +40,27 @@ export default function HomePage() {
       setLoading(true);
       const res = await fetch('/api/bookings');
       const data = await res.json();
-      if (data.success && data.bookings) {
-        setBookings(data.bookings);
+      let serverList: BookingRecord[] = (data.success && data.bookings) ? data.bookings : [];
+
+      if (typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem('pw_local_bookings');
+          if (cached) {
+            const localList = JSON.parse(cached) as BookingRecord[];
+            const map = new Map<string, BookingRecord>();
+            for (const b of localList) map.set(b.id, b);
+            for (const b of serverList) map.set(b.id, b);
+            serverList = Array.from(map.values()).sort((a, b) => 
+              new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+            );
+          }
+          localStorage.setItem('pw_local_bookings', JSON.stringify(serverList));
+        } catch (e) {
+          // ignore
+        }
       }
+
+      setBookings(serverList);
     } catch (err) {
       console.error('Failed to load bookings:', err);
     } finally {
@@ -55,9 +73,21 @@ export default function HomePage() {
       const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.success && data.settings) {
+        let mergedSettings = { ...data.settings };
+        if (typeof window !== 'undefined') {
+          try {
+            const localSettings = localStorage.getItem('pw_local_settings');
+            if (localSettings) {
+              const parsed = JSON.parse(localSettings);
+              if (parsed.googleSheetWebhookUrl && !mergedSettings.googleSheetWebhookUrl) {
+                mergedSettings.googleSheetWebhookUrl = parsed.googleSheetWebhookUrl;
+              }
+            }
+          } catch (e) {}
+        }
         setSettings(prev => ({
           ...prev,
-          ...data.settings
+          ...mergedSettings
         }));
         if (data.settings.smtpUser && !testEmailAddress) {
           setTestEmailAddress(data.settings.smtpUser);
@@ -74,6 +104,15 @@ export default function HomePage() {
   }, [fetchBookings, loadSettings]);
 
   const handleBookingCreated = (newBooking: BookingRecord) => {
+    setBookings(prev => {
+      const updated = [newBooking, ...prev.filter(b => b.id !== newBooking.id)];
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('pw_local_bookings', JSON.stringify(updated));
+        } catch (e) {}
+      }
+      return updated;
+    });
     fetchBookings();
   };
 
@@ -81,6 +120,9 @@ export default function HomePage() {
     e.preventDefault();
     setSettingsNotice(null);
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pw_local_settings', JSON.stringify(settings));
+      }
       const res = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -1,10 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { AppSettings } from './types';
 import { PW_GLOBAL_DEFAULT_SUPPORT_EMAIL } from './constants';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
+const TMP_SETTINGS_FILE = path.join(os.tmpdir(), 'pw_global_settings.json');
 
 const defaultSettings: AppSettings = {
   smtpHost: process.env.SMTP_HOST || '',
@@ -19,39 +21,64 @@ const defaultSettings: AppSettings = {
 
 let memorySettings: AppSettings = { ...defaultSettings };
 
-function ensureSettingsFile() {
+function readSettingsFromDisk(): Partial<AppSettings> {
+  // 1. Try reading from /tmp (writable on Vercel)
+  try {
+    if (fs.existsSync(TMP_SETTINGS_FILE)) {
+      const data = fs.readFileSync(TMP_SETTINGS_FILE, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  // 2. Try reading from project workspace settings file
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const data = fs.readFileSync(SETTINGS_FILE, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  return {};
+}
+
+function writeSettingsToDisk(settings: AppSettings) {
+  const jsonStr = JSON.stringify(settings, null, 2);
+
+  // 1. Always attempt write to serverless /tmp
+  try {
+    fs.writeFileSync(TMP_SETTINGS_FILE, jsonStr, 'utf-8');
+  } catch (err) {
+    // ignore
+  }
+
+  // 2. Attempt write to project workspace data folder (may be read-only on Vercel)
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
-    if (!fs.existsSync(SETTINGS_FILE)) {
-      fs.writeFileSync(SETTINGS_FILE, JSON.stringify(defaultSettings, null, 2), 'utf-8');
-    }
+    fs.writeFileSync(SETTINGS_FILE, jsonStr, 'utf-8');
   } catch (err) {
-    console.warn('Filesystem access failed for settings:', err);
+    // Expected on Vercel read-only filesystem
   }
 }
 
 export function getSettings(): AppSettings {
-  try {
-    ensureSettingsFile();
-    if (fs.existsSync(SETTINGS_FILE)) {
-      const data = fs.readFileSync(SETTINGS_FILE, 'utf-8');
-      const parsed = JSON.parse(data) as Partial<AppSettings>;
-      memorySettings = {
-        ...defaultSettings,
-        ...parsed,
-        // Allow env to override if provided
-        smtpHost: parsed.smtpHost || process.env.SMTP_HOST || '',
-        smtpUser: parsed.smtpUser || process.env.SMTP_USER || '',
-        smtpPass: parsed.smtpPass || process.env.SMTP_PASS || '',
-        googleSheetWebhookUrl: parsed.googleSheetWebhookUrl || process.env.GOOGLE_SHEET_WEBHOOK_URL || ''
-      };
-      return memorySettings;
-    }
-  } catch (err) {
-    console.warn('Error reading settings file:', err);
-  }
+  const diskSettings = readSettingsFromDisk();
+
+  memorySettings = {
+    ...defaultSettings,
+    ...diskSettings,
+    // Always let explicit environment variables override if present
+    smtpHost: diskSettings.smtpHost || process.env.SMTP_HOST || defaultSettings.smtpHost,
+    smtpUser: diskSettings.smtpUser || process.env.SMTP_USER || defaultSettings.smtpUser,
+    smtpPass: diskSettings.smtpPass || process.env.SMTP_PASS || defaultSettings.smtpPass,
+    googleSheetWebhookUrl: diskSettings.googleSheetWebhookUrl || process.env.GOOGLE_SHEET_WEBHOOK_URL || defaultSettings.googleSheetWebhookUrl
+  };
+
   return memorySettings;
 }
 
@@ -64,13 +91,7 @@ export function saveSettings(updates: Partial<AppSettings>): AppSettings {
   };
 
   memorySettings = merged;
-
-  try {
-    ensureSettingsFile();
-    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(merged, null, 2), 'utf-8');
-  } catch (err) {
-    console.warn('Failed to write settings to file:', err);
-  }
+  writeSettingsToDisk(merged);
 
   return merged;
 }
