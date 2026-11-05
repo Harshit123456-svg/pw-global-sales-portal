@@ -1,0 +1,10 @@
+{
+  "smtpHost": "",
+  "smtpPort": 587,
+  "smtpUser": "",
+  "smtpPass": "",
+  "smtpFrom": "PW Global Admissions <noreply@pw.live>",
+  "supportEmail": "pwglobal_support@pw.live",
+  "googleSheetWebhookUrl": "",
+  "googleSheetId": ""
+}

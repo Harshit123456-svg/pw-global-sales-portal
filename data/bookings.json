@@ -1,0 +1,677 @@
+[
+  {
+    "id": "PWG-2026-6843",
+    "token": "tok_wgyel3jrmw4085tb",
+    "createdAt": "2026-11-05T20:34:50.351Z",
+    "createdAtIST": "06/11/2026, 02:04:50 am IST",
+    "updatedAt": "2026-11-05T20:34:50.392Z",
+    "updatedAtIST": "06/11/2026, 02:04:50 am IST",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "Rohan Verma",
+      "counsellorEmail": "rohan.verma@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Instagram Meta Ads",
+      "saleDate": "06/11/2026"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "",
+      "courseEndDate": "",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 50000,
+      "soldPrice": 40000,
+      "discount": 10000,
+      "discountPercent": 20,
+      "currency": "INR",
+      "fullAmountPaid": "no",
+      "amountPaid": 0,
+      "dueAmount": 40000,
+      "dueDate": "",
+      "enrollmentDate": "06/11/2026",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Fake Test Student",
+      "fatherName": "Fake Parent",
+      "grade": "",
+      "studentEmail": "fake.student@gmail.com",
+      "parentEmail": "fake.parent@gmail.com",
+      "parentPhone": "",
+      "originCountry": "",
+      "countryOfResidence": "",
+      "city": "",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Fake Parent Signature",
+      "signedAt": "2026-11-05T20:34:50.387Z",
+      "signedAtIST": "06/11/2026, 02:04:50 am IST"
+    },
+    "audit": {
+      "counsellorIp": "103.21.244.1",
+      "counsellorUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0",
+      "counsellorCreatedAtIST": "06/11/2026, 02:04:50 am IST",
+      "authenticityStatus": "SAME_DEVICE_AS_COUNSELLOR",
+      "authenticityBadge": "⚠️ Same IP/Device as Counsellor",
+      "auditNotes": "Flagged: Signed on the same device/network as counsellor (103.21.244.1)",
+      "parentSubmitIp": "103.21.244.1",
+      "parentSubmitUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0",
+      "parentDeviceType": "Desktop"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:34:50.389Z",
+      "timestampIST": "06/11/2026, 02:04:50 am IST",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:34:50.390Z",
+      "timestampIST": "06/11/2026, 02:04:50 am IST",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-6206",
+    "token": "tok_78hb003xmw407xp7",
+    "createdAt": "2026-11-05T20:34:39.835Z",
+    "createdAtIST": "06/11/2026, 02:04:39 am IST",
+    "updatedAt": "2026-11-05T20:34:40.044Z",
+    "updatedAtIST": "06/11/2026, 02:04:40 am IST",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "Rohan Verma",
+      "counsellorEmail": "rohan.verma@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Instagram Meta Ads",
+      "saleDate": "2026-11-06"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "",
+      "courseEndDate": "",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 4000,
+      "soldPrice": 3200,
+      "discount": 800,
+      "discountPercent": 20,
+      "currency": "AED",
+      "fullAmountPaid": "yes",
+      "amountPaid": 3200,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "06/11/2026",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Devansh Singhania",
+      "fatherName": "Anil Singhania",
+      "grade": "Grade 11",
+      "studentEmail": "devansh.singhania@gmail.com",
+      "parentEmail": "anil.singhania@gulf.com",
+      "parentPhone": "+971 50 111 2222",
+      "originCountry": "India",
+      "countryOfResidence": "United Arab Emirates",
+      "city": "Dubai",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Anil Kumar Singhania",
+      "signedAt": "2026-11-05T20:34:40.039Z",
+      "signedAtIST": "06/11/2026, 02:04:40 am IST"
+    },
+    "audit": {
+      "counsellorIp": "103.21.244.1",
+      "counsellorUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0",
+      "counsellorCreatedAtIST": "06/11/2026, 02:04:39 am IST",
+      "authenticityStatus": "GENUINE_PARENT",
+      "authenticityBadge": "✅ Genuine Parent (Mobile)",
+      "auditNotes": "Signed remotely by parent on Mobile (IP: 86.96.142.50)",
+      "parentSubmitIp": "86.96.142.50",
+      "parentSubmitUserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148",
+      "parentDeviceType": "Mobile"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:34:40.042Z",
+      "timestampIST": "06/11/2026, 02:04:40 am IST",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:34:40.043Z",
+      "timestampIST": "06/11/2026, 02:04:40 am IST",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-9070",
+    "token": "tok_v8x0hcxkmw3zy4zq",
+    "createdAt": "2026-11-05T20:27:02.726Z",
+    "updatedAt": "2026-11-05T20:27:35.882Z",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "test",
+      "counsellorEmail": "h@gmail.com",
+      "counsellorPhone": "",
+      "sourceOfLead": "Website Form / Inbound Inquiry",
+      "saleDate": "2026-11-05"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "16 - English",
+      "courseStartDate": "2026-11-05",
+      "courseEndDate": "",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 65000,
+      "soldPrice": 50000,
+      "discount": 15000,
+      "discountPercent": 23,
+      "currency": "INR",
+      "fullAmountPaid": "yes",
+      "amountPaid": 50000,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "2026-11-05",
+      "paymentMode": "Online Gateway / Wire",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Test",
+      "fatherName": "Test",
+      "grade": "Grade 12",
+      "studentEmail": "harshit.badal@pw.live",
+      "parentEmail": "harshit.badal@pw.live",
+      "parentPhone": "4567890",
+      "originCountry": "India",
+      "countryOfResidence": "United Arab Emirates (UAE)",
+      "city": "Dubai",
+      "currentSchool": "NA",
+      "mockTestScore": "1300",
+      "targetScore": "1550",
+      "targetExamMonth": "May 2025",
+      "targetSchool": "NA",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Harshit",
+      "signedAt": "2026-11-05T20:27:35.872Z"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:27:35.879Z",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:27:35.881Z",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-7861",
+    "token": "tok_xrumcp2nmw3zx0g1",
+    "createdAt": "2026-11-05T20:26:10.177Z",
+    "updatedAt": "2026-11-05T20:26:10.308Z",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "Harshit Badal",
+      "counsellorEmail": "harshit.badal@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Website / Direct Inbound",
+      "saleDate": "2026-11-06"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "2025-06-01",
+      "courseEndDate": "2025-11-30",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 75000,
+      "soldPrice": 60000,
+      "discount": 15000,
+      "discountPercent": 20,
+      "currency": "INR",
+      "fullAmountPaid": "yes",
+      "amountPaid": 60000,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "2026-11-06",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Ishaan Verma",
+      "fatherName": "Arun Verma",
+      "grade": "Grade 11",
+      "studentEmail": "ishaan.verma.student@gmail.com",
+      "parentEmail": "arun.verma.parent@gmail.com",
+      "parentPhone": "+971 50 888 9999",
+      "originCountry": "India",
+      "countryOfResidence": "United Arab Emirates",
+      "city": "Dubai",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Arun K. Verma",
+      "signedAt": "2026-11-06T01:56:10.2931677+05:30"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:26:10.307Z",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:26:10.308Z",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-3733",
+    "token": "tok_bzipuqqpmw3zoyxi",
+    "createdAt": "2026-11-05T20:19:54.966Z",
+    "updatedAt": "2026-11-05T20:19:54.966Z",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "test",
+      "counsellorEmail": "Test@gmail.com",
+      "counsellorPhone": "",
+      "sourceOfLead": "Google Ads / Search",
+      "saleDate": "2026-11-05"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "32 - English & Maths Combined",
+      "courseStartDate": "2026-11-05",
+      "courseEndDate": "",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 65000,
+      "soldPrice": 50000,
+      "discount": 15000,
+      "discountPercent": 23,
+      "currency": "INR",
+      "fullAmountPaid": "no",
+      "amountPaid": 25000,
+      "dueAmount": 25000,
+      "dueDate": "2026-12-05",
+      "enrollmentDate": "2026-11-05",
+      "paymentMode": "Online Gateway / Wire",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Test",
+      "fatherName": "Test2",
+      "grade": "Grade 12",
+      "studentEmail": "harshit.badal@pw.live",
+      "parentEmail": "harshit.badal@pw.live",
+      "parentPhone": "4567890",
+      "originCountry": "India",
+      "countryOfResidence": "United Arab Emirates (UAE)",
+      "city": "Dubai",
+      "currentSchool": "NA",
+      "mockTestScore": "1300",
+      "targetScore": "1550",
+      "targetExamMonth": "May 2025",
+      "targetSchool": "NA",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Test (Enrolled by Counsellor: test)",
+      "signedAt": "2026-11-05T20:19:54.912Z"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:19:54.971Z",
+      "error": "SMTP not configured yet. Set SMTP credentials in Settings to dispatch live emails directly to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:19:54.973Z",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-1810",
+    "token": "tok_erwp3cf9mw3zm8rm",
+    "createdAt": "2026-11-05T20:17:47.746Z",
+    "updatedAt": "2026-11-05T20:17:47.852Z",
+    "status": "completed",
+    "fillMode": "parent_link",
+    "batchName": "SAT Ivy Global Accelerator 2026",
+    "sales": {
+      "salesRepresentative": "Priya Sharma",
+      "counsellorEmail": "priya.sharma@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Instagram / Meta Campaign - Global NRI",
+      "saleDate": "2026-11-06"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "16 - English",
+      "courseStartDate": "2025-05-15",
+      "courseEndDate": "2025-10-30",
+      "productEnrolled": "SAT Ivy Global Accelerator 2026"
+    },
+    "payment": {
+      "coursePrice": 4500,
+      "soldPrice": 3600,
+      "discount": 900,
+      "discountPercent": 20,
+      "currency": "AED",
+      "fullAmountPaid": "no",
+      "amountPaid": 2000,
+      "dueAmount": 1600,
+      "dueDate": "2026-11-25",
+      "enrollmentDate": "2026-11-06",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Kabir Patel",
+      "fatherName": "Mahesh Patel",
+      "grade": "Grade 11",
+      "studentEmail": "kabir.patel.student@gmail.com",
+      "parentEmail": "mahesh.patel@gulfparent.com",
+      "parentPhone": "+971 52 345 6789",
+      "originCountry": "India",
+      "countryOfResidence": "United Arab Emirates",
+      "city": "Dubai",
+      "currentSchool": "Dubai International Academy",
+      "mockTestScore": "1420",
+      "targetScore": "1580",
+      "targetExamMonth": "October 2025",
+      "targetSchool": "MIT / Stanford",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Mahesh Chimanbhai Patel",
+      "signedAt": "2026-11-06T01:47:47.7978510+05:30"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T20:17:47.849Z",
+      "error": "SMTP not configured yet. Set SMTP credentials in Settings to dispatch live emails directly to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T20:17:47.851Z",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-6863",
+    "token": "tok_lg4715pqmw3yowii",
+    "createdAt": "2026-11-05T19:51:52.218Z",
+    "updatedAt": "2026-11-05T19:51:52.218Z",
+    "status": "pending_parent_fill",
+    "fillMode": "parent_link",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "counsellor": {
+      "counsellorName": "Harshit",
+      "counsellorEmail": "h@gmail.com",
+      "counsellorPhone": ""
+    },
+    "payment": {
+      "coursePrice": 65000,
+      "soldPrice": 50000,
+      "discount": 15000,
+      "discountPercent": 23,
+      "currency": "INR",
+      "fullAmountPaid": "no",
+      "amountPaid": 50000,
+      "dueAmount": 0,
+      "dueDate": "2026-12-24",
+      "enrollmentDate": "2026-11-25",
+      "paymentMode": "Online Gateway / Transfer",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "",
+      "fatherName": "Na",
+      "grade": "Grade 11",
+      "studentEmail": "",
+      "parentEmail": "test@gmail.com",
+      "parentPhone": "4567890",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": false,
+      "parent": false,
+      "counsellor": false,
+      "support": false
+    }
+  },
+  {
+    "id": "PWG-2026-6062",
+    "token": "tok_7uwpt7tlmw3ymalt",
+    "createdAt": "2026-11-05T19:49:50.513Z",
+    "updatedAt": "2026-11-05T19:49:50.513Z",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "counsellor": {
+      "counsellorName": "Harshit",
+      "counsellorEmail": "Harshit.Test@gmail.com",
+      "counsellorPhone": ""
+    },
+    "payment": {
+      "coursePrice": 4500,
+      "soldPrice": 1500,
+      "discount": 3000,
+      "discountPercent": 67,
+      "currency": "AED",
+      "fullAmountPaid": "no",
+      "amountPaid": 500,
+      "dueAmount": 1000,
+      "dueDate": "2026-12-04",
+      "enrollmentDate": "2026-11-05",
+      "paymentMode": "Online Gateway / Wire",
+      "transactionRef": "NA"
+    },
+    "student": {
+      "name": "Harshit",
+      "fatherName": "Test",
+      "grade": "Grade 11",
+      "studentEmail": "harshit.badal@pw.live",
+      "parentEmail": "harshit.badal@pw.live",
+      "parentPhone": "7067388454",
+      "currentSchool": "NA",
+      "mockTestScore": "1300",
+      "targetScore": "1550",
+      "targetExamMonth": "May 2027",
+      "targetSchool": "NA",
+      "photoUrl": ""
+    },
+    "supportEmailRecipient": "pwGlobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T19:49:50.513Z"
+    }
+  },
+  {
+    "id": "PWG-2026-3287",
+    "token": "tok_rzz9sh04mw3yezvu",
+    "createdAt": "2026-11-05T19:44:10.026Z",
+    "updatedAt": "2026-11-05T19:44:10.078Z",
+    "status": "completed",
+    "fillMode": "parent_link",
+    "batchName": "JEE Main + Advanced (Global NRI Batch - 11th)",
+    "counsellor": {
+      "counsellorName": "Ananya Sen",
+      "counsellorEmail": "ananya.sen@pw.live",
+      "counsellorPhone": ""
+    },
+    "payment": {
+      "coursePrice": 120000,
+      "soldPrice": 90000,
+      "discount": 30000,
+      "discountPercent": 25,
+      "currency": "INR",
+      "fullAmountPaid": "yes",
+      "amountPaid": 90000,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "2026-11-06",
+      "paymentMode": "Credit Card Online",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Rohan Gupta",
+      "fatherName": "Dr. Rajesh Gupta",
+      "grade": "Grade 11",
+      "studentEmail": "rohan.gupta.student@gmail.com",
+      "parentEmail": "rajesh.gupta@gulfmail.com",
+      "parentPhone": "+966 50 987 6543",
+      "currentSchool": "Indian International School, Riyadh",
+      "mockTestScore": "240 / 300",
+      "targetScore": "99.8%ile",
+      "targetExamMonth": "January 2026",
+      "targetSchool": "IIT Bombay Computer Science",
+      "photoUrl": ""
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T19:44:10.077Z"
+    }
+  },
+  {
+    "id": "PWG-2026-1091",
+    "token": "tok_he7flb9vmw3yeqcq",
+    "createdAt": "2026-11-05T19:43:57.674Z",
+    "updatedAt": "2026-11-05T19:43:57.674Z",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "counsellor": {
+      "counsellorName": "Harshit Badal",
+      "counsellorEmail": "harshit.badal@pw.live",
+      "counsellorPhone": ""
+    },
+    "payment": {
+      "coursePrice": 80000,
+      "soldPrice": 60000,
+      "discount": 20000,
+      "discountPercent": 25,
+      "currency": "INR",
+      "fullAmountPaid": "no",
+      "amountPaid": 40000,
+      "dueAmount": 20000,
+      "dueDate": "2026-11-28",
+      "enrollmentDate": "2026-11-06",
+      "paymentMode": "International Wire / SWIFT",
+      "transactionRef": "TXN_PWG_998811"
+    },
+    "student": {
+      "name": "Aarav Sharma",
+      "fatherName": "Vikram Sharma",
+      "grade": "Grade 11",
+      "studentEmail": "aarav.sharma@gmail.com",
+      "parentEmail": "vikram.sharma@parent.com",
+      "parentPhone": "+971 50 123 4567",
+      "currentSchool": "GEMS Modern Academy, Dubai",
+      "mockTestScore": "1380 / 1600",
+      "targetScore": "1550+",
+      "targetExamMonth": "October 2025",
+      "targetSchool": "UC Berkeley / Stanford",
+      "photoUrl": ""
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-05T19:43:57.745Z"
+    }
+  }
+]
