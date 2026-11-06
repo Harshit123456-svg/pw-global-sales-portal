@@ -39,9 +39,14 @@ export async function PUT(
     const body = await req.json();
     let existing = getBookingById(params.id);
 
-    // Fallback: If not found in storage, but client supplied originalBooking (e.g. from state), use it!
+    // Fallback 1: If not found in storage, but client supplied originalBooking (e.g. from state), use it!
     if (!existing && body.originalBooking) {
       existing = body.originalBooking;
+    }
+
+    // Fallback 2: Check token in body if params.id was 'stateless' or not found
+    if (!existing && body.token) {
+      existing = getBookingById(body.token);
     }
 
     if (!existing) {

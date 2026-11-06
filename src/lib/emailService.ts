@@ -425,7 +425,9 @@ async function dispatchEmail(recipients: string[], subject: string, html: string
 
 // Export 1: Send Parent Signing Invitation Email (When counsellor submits sales form)
 export async function sendParentSigningInviteEmail(booking: BookingRecord, baseUrl: string) {
-  const signingUrl = `${baseUrl}/parent/${booking.token}`;
+  const signingUrl = booking.token?.startsWith('tok_')
+    ? `${baseUrl}/parent/${booking.id}?t=${booking.token}`
+    : `${baseUrl}/parent/${booking.token || booking.id}`;
   const parentEmail = booking.student.parentEmail;
   const salesEmail = booking.sales?.counsellorEmail;
 

@@ -565,7 +565,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({
                           {/* Share link if pending */}
                           {b.status === 'pending_parent_fill' && (
                             <a
-                              href={`/parent/${b.token}`}
+                              href={b.token && b.token.startsWith('tok_') ? `/parent/${b.id}?t=${b.token}` : `/parent/${b.token || b.id}`}
                               target="_blank"
                               rel="noreferrer"
                               className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"

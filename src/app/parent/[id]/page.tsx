@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { PWLogo } from '@/components/PWLogo';
 import { 
   CheckCircle2, ShieldAlert, Upload, X, AlertCircle, 
@@ -11,12 +11,15 @@ import {
 import { GRADES, TARGET_EXAM_MONTHS, COUNTRIES, ADMISSION_TERMS_AND_CONDITIONS } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
 import { PhoneInput } from '@/components/PhoneInput';
+import { decodeBookingToken } from '@/lib/tokenUtils';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
 
 export default function ParentOnboardingPage() {
   const params = useParams();
-  const idOrToken = params?.id as string;
+  const searchParams = useSearchParams();
+  const idOrToken = (params?.id as string) || '';
+  const tokenFromQuery = searchParams?.get('t') || '';
 
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState<BookingRecord | null>(null);
@@ -49,38 +52,66 @@ export default function ParentOnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  const populateForm = useCallback((b: BookingRecord) => {
+    if (b.student.name) setStudentName(b.student.name);
+    if (b.student.fatherName) setFatherName(b.student.fatherName);
+    if (b.student.grade) setGrade(b.student.grade);
+    if (b.student.studentEmail) setStudentEmail(b.student.studentEmail);
+    if (b.student.parentEmail) setParentEmail(b.student.parentEmail);
+    if (b.student.parentPhone) setParentPhone(b.student.parentPhone);
+    if (b.student.originCountry) setOriginCountry(b.student.originCountry);
+    if (b.student.countryOfResidence) setCountryOfResidence(b.student.countryOfResidence);
+    if (b.student.city) setCity(b.student.city);
+    if (b.student.currentSchool) setCurrentSchool(b.student.currentSchool);
+    if (b.student.mockTestScore) setMockTestScore(b.student.mockTestScore);
+    if (b.student.targetScore) setTargetScore(b.student.targetScore);
+    if (b.student.targetSchool) setTargetSchool(b.student.targetSchool);
+    if (b.student.photoUrl) setPhotoPreview(b.student.photoUrl);
+    if (b.status === 'completed') {
+      setIsCompleted(true);
+    }
+  }, []);
+
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        // Note: role=parent tells API to hide internal fields like sourceOfLead
-        const res = await fetch(`/api/bookings/${encodeURIComponent(idOrToken)}?role=parent`);
-        const data = await res.json();
+        setErrorMsg(null);
 
-        if (!res.ok || !data.success || !data.booking) {
-          throw new Error(data.error || 'Invalid or expired onboarding link.');
+        // 1. Check if token is present (either in query param ?t=tok_... or in path /parent/tok_...)
+        const candidateToken = tokenFromQuery.startsWith('tok_') 
+          ? tokenFromQuery 
+          : (idOrToken.startsWith('tok_') ? idOrToken : null);
+
+        let localBooking: BookingRecord | null = null;
+        if (candidateToken) {
+          localBooking = decodeBookingToken(candidateToken);
         }
 
-        const b: BookingRecord = data.booking;
-        setBooking(b);
+        // If decoded locally, render immediately with 0ms network latency
+        if (localBooking) {
+          setBooking(localBooking);
+          populateForm(localBooking);
+          setLoading(false);
+        }
 
-        if (b.student.name) setStudentName(b.student.name);
-        if (b.student.fatherName) setFatherName(b.student.fatherName);
-        if (b.student.grade) setGrade(b.student.grade);
-        if (b.student.studentEmail) setStudentEmail(b.student.studentEmail);
-        if (b.student.parentEmail) setParentEmail(b.student.parentEmail);
-        if (b.student.parentPhone) setParentPhone(b.student.parentPhone);
-        if (b.student.originCountry) setOriginCountry(b.student.originCountry);
-        if (b.student.countryOfResidence) setCountryOfResidence(b.student.countryOfResidence);
-        if (b.student.city) setCity(b.student.city);
-        if (b.student.currentSchool) setCurrentSchool(b.student.currentSchool);
-        if (b.student.mockTestScore) setMockTestScore(b.student.mockTestScore);
-        if (b.student.targetScore) setTargetScore(b.student.targetScore);
-        if (b.student.targetSchool) setTargetSchool(b.student.targetSchool);
-        if (b.student.photoUrl) setPhotoPreview(b.student.photoUrl);
-
-        if (b.status === 'completed') {
-          setIsCompleted(true);
+        // 2. Fetch server record using short clean ID to check for live updates/completion
+        const lookupId = localBooking?.id || (idOrToken.startsWith('tok_') ? '' : idOrToken);
+        if (lookupId) {
+          try {
+            const res = await fetch(`/api/bookings/${encodeURIComponent(lookupId)}?role=parent`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.booking) {
+                setBooking(data.booking);
+                populateForm(data.booking);
+              }
+            }
+          } catch (e) {
+            console.log('[ParentPage] Running in self-contained mode:', e);
+          }
+        } else if (!localBooking) {
+          throw new Error('Onboarding link not found or expired. Please contact your PW Global Sales Counsellor.');
         }
       } catch (err: any) {
         setErrorMsg(err.message || 'Could not load enrollment details.');
@@ -89,21 +120,45 @@ export default function ParentOnboardingPage() {
       }
     }
 
-    if (idOrToken) {
+    if (idOrToken || tokenFromQuery) {
       loadData();
     }
-  }, [idOrToken]);
+  }, [idOrToken, tokenFromQuery, populateForm]);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Photo size exceeds 5MB. Please choose a smaller photo.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Photo must be less than 10MB');
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPhotoPreview(reader.result as string);
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        // Small sharp ~15KB JPEG
+        setPhotoPreview(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = ev.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -184,12 +239,14 @@ export default function ParentOnboardingPage() {
         }
       };
 
-      const res = await fetch(`/api/bookings/${encodeURIComponent(idOrToken)}`, {
+      const submitId = booking?.id || (idOrToken.startsWith('tok_') ? 'stateless' : idOrToken);
+      const res = await fetch(`/api/bookings/${encodeURIComponent(submitId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...payload,
-          originalBooking: booking
+          originalBooking: booking,
+          token: booking?.token || (idOrToken.startsWith('tok_') ? idOrToken : '')
         })
       });
 

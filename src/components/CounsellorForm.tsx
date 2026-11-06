@@ -158,19 +158,42 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
     }
   }, [fullAmountPaid, soldPrice]);
 
-  // Handle Photo upload
+  // Handle Photo upload with client-side canvas downscaling (max 320px, ~15KB JPEG)
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Photo size exceeds 5MB. Please upload a smaller image.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Photo size exceeds 10MB. Please upload a smaller image.');
       return;
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPhotoPreview(reader.result as string);
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        setPhotoPreview(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = ev.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -307,7 +330,11 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
 
       setCompletedBooking(data.booking);
       const hostOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-      setParentSigningUrl(`${hostOrigin}/parent/${data.booking.token}`);
+      const token = data.booking.token;
+      const shareUrl = token && token.startsWith('tok_')
+        ? `${hostOrigin}/parent/${data.booking.id}?t=${token}`
+        : `${hostOrigin}/parent/${token || data.booking.id}`;
+      setParentSigningUrl(shareUrl);
       if (onSuccess) onSuccess(data.booking);
 
       confetti({

@@ -184,10 +184,14 @@ export async function POST(req: NextRequest) {
 
     saveBooking(booking);
 
+    const signingUrl = booking.token?.startsWith('tok_')
+      ? `${baseUrl}/parent/${booking.id}?t=${booking.token}`
+      : `${baseUrl}/parent/${booking.token || booking.id}`;
+
     return NextResponse.json({
       success: true,
       booking,
-      parentSigningUrl: `${baseUrl}/parent/${booking.token}`,
+      parentSigningUrl: signingUrl,
       emailResult,
       sheetResult
     });

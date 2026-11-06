@@ -232,7 +232,11 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
   const getShareUrl = () => {
     if (!generatedBooking) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/parent/${generatedBooking.token}`;
+    const token = generatedBooking.token || '';
+    if (token.startsWith('tok_')) {
+      return `${origin}/parent/${generatedBooking.id}?t=${token}`;
+    }
+    return `${origin}/parent/${token || generatedBooking.id}`;
   };
 
   const handleCopy = () => {
@@ -372,7 +376,7 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
             )}
 
             <a
-              href={`/parent/${generatedBooking.token}`}
+              href={getShareUrl()}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
