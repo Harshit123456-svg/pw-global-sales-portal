@@ -7,7 +7,7 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const BATCHES_FILE = path.join(DATA_DIR, 'batches.json');
 const TMP_BATCHES_FILE = path.join(os.tmpdir(), 'pw_global_batches.json');
 
-let memoryBatches: string[] = [...INITIAL_BATCHES];
+let memoryBatches: string[] = [];
 
 function readBatchesFromDisk(): string[] {
   // 1. Try reading from serverless /tmp
@@ -15,7 +15,7 @@ function readBatchesFromDisk(): string[] {
     if (fs.existsSync(TMP_BATCHES_FILE)) {
       const data = fs.readFileSync(TMP_BATCHES_FILE, 'utf-8');
       const list = JSON.parse(data);
-      if (Array.isArray(list) && list.length > 0) return list;
+      if (Array.isArray(list)) return list;
     }
   } catch (err) {}
 
@@ -24,11 +24,11 @@ function readBatchesFromDisk(): string[] {
     if (fs.existsSync(BATCHES_FILE)) {
       const data = fs.readFileSync(BATCHES_FILE, 'utf-8');
       const list = JSON.parse(data);
-      if (Array.isArray(list) && list.length > 0) return list;
+      if (Array.isArray(list)) return list;
     }
   } catch (err) {}
 
-  return [...INITIAL_BATCHES];
+  return [];
 }
 
 function writeBatchesToDisk(list: string[]) {
@@ -51,7 +51,7 @@ function writeBatchesToDisk(list: string[]) {
 export function getAllBatches(): string[] {
   const disk = readBatchesFromDisk();
   // Merge uniquely
-  const set = new Set([...INITIAL_BATCHES, ...memoryBatches, ...disk]);
+  const set = new Set([...memoryBatches, ...disk]);
   memoryBatches = Array.from(set);
   return memoryBatches;
 }

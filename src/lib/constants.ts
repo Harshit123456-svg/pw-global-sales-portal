@@ -1,21 +1,6 @@
 export const PW_GLOBAL_DEFAULT_SUPPORT_EMAIL = process.env.PW_GLOBAL_SUPPORT_EMAIL || 'pwglobal_support@pw.live';
 
-export const INITIAL_BATCHES = [
-  'SAT / Digital SAT Complete Prep 2025-2026',
-  'ACT Global FastTrack Batch',
-  'JEE Main + Advanced (Global NRI Batch - 11th)',
-  'JEE Main + Advanced (Global NRI Batch - 12th)',
-  'NEET UG (Global NRI Batch - 11th)',
-  'NEET UG (Global NRI Batch - 12th)',
-  'CBSE Global Foundation (Grade 9)',
-  'CBSE Global Foundation (Grade 10)',
-  'CBSE Global Senior (Grade 11 - PCM/PCB)',
-  'CBSE Global Senior (Grade 12 - PCM/PCB)',
-  'IB Diploma Programme (IBDP HL/SL Math & Sciences)',
-  'Cambridge IGCSE & A-Levels Accelerator',
-  'AP (Advanced Placement) Calculus & Physics',
-  '1-on-1 Personalized Ivy/Global Mentorship Batch'
-];
+export const INITIAL_BATCHES: string[] = [];
 
 export const LEAD_SOURCES = [
   'Website Form / Inbound Inquiry',

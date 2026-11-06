@@ -19,7 +19,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   
   // Global Batches State (Shared across all tabs)
-  const [batches, setBatches] = useState<string[]>(INITIAL_BATCHES);
+  const [batches, setBatches] = useState<string[]>([]);
 
   // Settings Modal State
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -105,24 +105,22 @@ export default function HomePage() {
   const fetchBatches = useCallback(async () => {
     try {
       if (typeof window !== 'undefined') {
-        const cached = localStorage.getItem('pw_local_batches');
+        localStorage.removeItem('pw_local_batches');
+        const cached = localStorage.getItem('pw_local_batches_v3');
         if (cached) {
           const list = JSON.parse(cached);
-          if (Array.isArray(list) && list.length > 0) {
-            setBatches(prev => Array.from(new Set([...INITIAL_BATCHES, ...prev, ...list])));
+          if (Array.isArray(list)) {
+            setBatches(list);
           }
         }
       }
       const res = await fetch('/api/batches');
       const data = await res.json();
-      if (data.success && data.batches?.length > 0) {
-        setBatches(prev => {
-          const merged = Array.from(new Set([...INITIAL_BATCHES, ...prev, ...data.batches]));
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('pw_local_batches', JSON.stringify(merged));
-          }
-          return merged;
-        });
+      if (data.success && Array.isArray(data.batches)) {
+        setBatches(data.batches);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pw_local_batches_v3', JSON.stringify(data.batches));
+        }
       }
     } catch (e) {}
   }, []);
@@ -134,7 +132,7 @@ export default function HomePage() {
       if (prev.includes(clean)) return prev;
       const updated = [...prev, clean];
       if (typeof window !== 'undefined') {
-        localStorage.setItem('pw_local_batches', JSON.stringify(updated));
+        localStorage.setItem('pw_local_batches_v3', JSON.stringify(updated));
       }
       return updated;
     });

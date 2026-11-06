@@ -45,7 +45,10 @@ export async function POST(req: NextRequest) {
     const amountPaid = fullAmountPaid === 'yes' ? soldPrice : (Number(body.payment?.amountPaid) || 0);
     const dueAmount = fullAmountPaid === 'yes' ? 0 : Math.max(0, soldPrice - amountPaid);
 
-    const productEnrolled = (body.program?.productEnrolled || body.batchName || 'SAT / Digital SAT Complete Prep 2025-2026').trim();
+    const productEnrolled = (body.program?.productEnrolled || body.batchName || '').trim();
+    if (!productEnrolled) {
+      return NextResponse.json({ success: false, error: 'Product / Batch Name is required' }, { status: 400 });
+    }
     if (productEnrolled) {
       addBatchIfNew(productEnrolled);
     }

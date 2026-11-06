@@ -35,11 +35,13 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
   const [newBatchInput, setNewBatchInput] = useState('');
 
   useEffect(() => {
-    if (sharedBatches && sharedBatches.length > 0) {
+    if (sharedBatches) {
       setBatches(sharedBatches);
-      if (!selectedBatch) setSelectedBatch(sharedBatches[0]);
+      if (!selectedBatch && sharedBatches.length > 0) {
+        setSelectedBatch(sharedBatches[0]);
+      }
     }
-  }, [sharedBatches]);
+  }, [sharedBatches, selectedBatch]);
 
   // Form State: Sales & Counsellor
   const [salesRepresentative, setSalesRepresentative] = useState('');
@@ -96,16 +98,18 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
       try {
         const res = await fetch('/api/batches');
         const data = await res.json();
-        if (data.success && data.batches?.length > 0) {
+        if (data.success && Array.isArray(data.batches)) {
           setBatches(data.batches);
-          setSelectedBatch(data.batches[0]);
+          if (data.batches.length > 0 && !selectedBatch) {
+            setSelectedBatch(data.batches[0]);
+          }
         }
       } catch (err) {
         console.error('Failed to load batches:', err);
       }
     }
     loadBatches();
-  }, []);
+  }, [selectedBatch]);
 
   // Auto calculate discount
   const discountAmount = useMemo(() => {
@@ -262,7 +266,14 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
       }
     }
 
-    const effectiveBatch = selectedBatch || 'SAT / Digital SAT Complete Prep 2025-2026';
+    const effectiveBatch = (selectedBatch || newBatchInput).trim();
+    if (!effectiveBatch) {
+      setErrorMsg('Please select or add a Product / Batch Name.');
+      return;
+    }
+    if (newBatchInput.trim() && !batches.includes(newBatchInput.trim())) {
+      handleAddNewBatch();
+    }
 
     setIsSubmitting(true);
 
@@ -698,21 +709,24 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
               </button>
             </div>
 
-            {isAddingNewBatch ? (
+            {isAddingNewBatch || batches.length === 0 ? (
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={newBatchInput}
-                  onChange={(e) => setNewBatchInput(e.target.value)}
+                  onChange={(e) => {
+                    setNewBatchInput(e.target.value);
+                    setSelectedBatch(e.target.value);
+                  }}
                   placeholder="Type new official batch name"
                   className="flex-1 bg-white border border-indigo-300 rounded-xl px-3 py-2 text-xs text-slate-900"
                 />
                 <button
                   type="button"
                   onClick={handleAddNewBatch}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 whitespace-nowrap"
                 >
-                  Save Uniform Batch
+                  Save Batch
                 </button>
               </div>
             ) : (
@@ -721,6 +735,7 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
                 onChange={(e) => setSelectedBatch(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900"
               >
+                <option value="">-- Select Enrolled Batch --</option>
                 {batches.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             )}

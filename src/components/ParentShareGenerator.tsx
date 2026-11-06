@@ -32,11 +32,13 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
   const [newBatchInput, setNewBatchInput] = useState('');
 
   useEffect(() => {
-    if (sharedBatches && sharedBatches.length > 0) {
+    if (sharedBatches) {
       setBatches(sharedBatches);
-      if (!productEnrolled) setProductEnrolled(sharedBatches[0]);
+      if (!productEnrolled && sharedBatches.length > 0) {
+        setProductEnrolled(sharedBatches[0]);
+      }
     }
-  }, [sharedBatches]);
+  }, [sharedBatches, productEnrolled]);
 
   // Counsellor & Sales Info
   const [salesRepresentative, setSalesRepresentative] = useState('');
@@ -76,16 +78,18 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
       try {
         const res = await fetch('/api/batches');
         const data = await res.json();
-        if (data.success && data.batches?.length > 0) {
+        if (data.success && Array.isArray(data.batches)) {
           setBatches(data.batches);
-          setProductEnrolled(data.batches[0]);
+          if (data.batches.length > 0 && !productEnrolled) {
+            setProductEnrolled(data.batches[0]);
+          }
         }
       } catch (err) {
         console.error('Failed to load batches:', err);
       }
     }
     loadBatches();
-  }, []);
+  }, [productEnrolled]);
 
   // Discount computation
   const discountAmount = useMemo(() => {
@@ -167,13 +171,22 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
       }
     }
 
+    const effectiveBatch = (productEnrolled || newBatchInput).trim();
+    if (!effectiveBatch) {
+      setErrorMsg('Please select or add a Product / Batch Name.');
+      return;
+    }
+    if (newBatchInput.trim() && !batches.includes(newBatchInput.trim())) {
+      handleAddNewBatch();
+    }
+
     setIsSubmitting(true);
 
     try {
       const payload = {
         fillMode: 'parent_link',
         status: 'pending_parent_fill',
-        batchName: productEnrolled || 'SAT Complete Prep',
+        batchName: effectiveBatch,
         sales: {
           salesRepresentative: salesRepresentative.trim(),
           counsellorEmail: counsellorEmail.trim(),
@@ -186,7 +199,7 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
           groupHours: programSelection === 'Group' ? groupHours : undefined,
           courseStartDate,
           courseEndDate,
-          productEnrolled
+          productEnrolled: effectiveBatch
         },
         supportEmailRecipient: PW_GLOBAL_DEFAULT_SUPPORT_EMAIL,
         student: {
@@ -533,19 +546,22 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
                   </button>
                 </div>
 
-                {isAddingNewBatch ? (
+                {isAddingNewBatch || batches.length === 0 ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={newBatchInput}
-                      onChange={(e) => setNewBatchInput(e.target.value)}
+                      onChange={(e) => {
+                        setNewBatchInput(e.target.value);
+                        setProductEnrolled(e.target.value);
+                      }}
                       placeholder="Type batch name to add for all counsellors"
                       className="flex-1 bg-white border border-indigo-300 rounded-xl px-3 py-2 text-xs text-slate-900"
                     />
                     <button
                       type="button"
                       onClick={handleAddNewBatch}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700"
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 whitespace-nowrap"
                     >
                       Save Batch
                     </button>
@@ -556,6 +572,7 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
                     onChange={(e) => setProductEnrolled(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900"
                   >
+                    <option value="">-- Select Enrolled Batch --</option>
                     {batches.map(b => <option key={b} value={b}>{b}</option>)}
                   </select>
                 )}
