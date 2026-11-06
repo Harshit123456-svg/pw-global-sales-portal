@@ -17,6 +17,14 @@ export function formatBookingForGoogleSheet(b: BookingRecord) {
     deviceAuditInfo = `Counsellor Entry (${b.audit.counsellorIp || 'Office'})`;
   }
 
+  const currency = (b.payment?.currency || 'INR').trim().toUpperCase();
+  const cpNum = Number(b.payment?.coursePrice) || 0;
+  const spNum = Number(b.payment?.soldPrice) || 0;
+  const discountNum = Math.max(0, cpNum - spNum);
+  const discountPct = cpNum > 0 ? Math.round((discountNum / cpNum) * 100) : 0;
+  const apNum = Number(b.payment?.amountPaid) || 0;
+  const dueNum = Number(b.payment?.dueAmount) || Math.max(0, spNum - apNum);
+
   return {
     id: b.id,
     saleDate: b.sales?.saleDate || b.payment?.enrollmentDate,
@@ -39,14 +47,15 @@ export function formatBookingForGoogleSheet(b: BookingRecord) {
     courseStartDate: b.program?.courseStartDate || '',
     courseEndDate: b.program?.courseEndDate || '',
     productEnrolled: b.program?.productEnrolled || b.batchName,
-    coursePrice: b.payment?.coursePrice || 0,
-    soldPrice: b.payment?.soldPrice || 0,
-    discount: b.payment?.discount || 0,
-    discountPercent: b.payment?.discountPercent || 0,
-    fullAmountPaid: b.payment?.fullAmountPaid || 'yes',
-    amountPaid: b.payment?.amountPaid || 0,
-    dueAmount: b.payment?.dueAmount || 0,
-    dueDate: b.payment?.dueDate || '',
+    currency,
+    coursePrice: `${currency} ${cpNum.toLocaleString('en-IN')}`,
+    soldPrice: `${currency} ${spNum.toLocaleString('en-IN')}`,
+    discount: `${currency} ${discountNum.toLocaleString('en-IN')}`,
+    discountPercent: `${discountPct}%`,
+    fullAmountPaid: b.payment?.fullAmountPaid === 'yes' ? 'YES (Full)' : 'NO (Partial)',
+    amountPaid: `${currency} ${apNum.toLocaleString('en-IN')}`,
+    dueAmount: dueNum > 0 ? `${currency} ${dueNum.toLocaleString('en-IN')}` : `${currency} 0`,
+    dueDate: b.payment?.dueDate || (b.payment?.fullAmountPaid === 'yes' ? 'N/A (Fully Paid)' : ''),
     termsAccepted: b.terms?.termsAccepted || false,
     parentLegalSignature: b.terms?.parentLegalSignature || '',
     signedAtIST: b.terms?.signedAt ? formatToIST(b.terms.signedAt) : '',

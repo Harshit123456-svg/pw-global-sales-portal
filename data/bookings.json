@@ -1,5 +1,89 @@
 [
   {
+    "id": "PWG-2026-7893",
+    "token": "tok_VZDLTsMwEEV_xfK6ae28mmbV0lYVCyREg5C6qSaJ21iK4-AkIED8OzMJ4rHy-Mzr3vngmqf8_ung-cKPvWWyCviMdw3CE-iSbWrvDprOWof4QjgDp5__86tDfnBQKiYltSv8v2P7un2d1_pFIWuJ9dS7vhrQ9bywhnCFeLWUkZB-EEbxEpktkOFb0NjHRvcKdTjI2d5oB73qKEeyd0MOmj7d1JCTvuMmY-SFHYb6wm6gLypMwRumEEejT1o8abZDSwZIxdaatla9Yls7OLSAc1uehpEQ6AijIKEIMPJHVgJPZTBG5TQ89qTvCbpAMSDZ7Hd0DFr0YCto2LECZ2A80NkgdUT_3KijOSJeSLn4Vlm4c_8zW3oizqRIQ5mKZL4Kk9NUoTuq-e2bMRGmkopYa9jtMeOfXw",
+    "createdAt": "2026-11-06T10:41:08.948Z",
+    "createdAtIST": "06/11/2026, 04:11:08 pm IST",
+    "updatedAt": "2026-11-06T10:41:12.075Z",
+    "updatedAtIST": "06/11/2026, 04:11:08 pm IST",
+    "status": "pending_parent_fill",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT 2026 Gulf Batch",
+    "sales": {
+      "salesRepresentative": "Rohan Sharma",
+      "counsellorEmail": "rohan@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Direct Inquiry",
+      "saleDate": "06/11/2026"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "",
+      "courseEndDate": "",
+      "productEnrolled": "SAT 2026 Gulf Batch"
+    },
+    "payment": {
+      "coursePrice": 4500,
+      "soldPrice": 3800,
+      "discount": 700,
+      "discountPercent": 16,
+      "currency": "AED",
+      "fullAmountPaid": "no",
+      "amountPaid": 2500,
+      "dueAmount": 1300,
+      "dueDate": "2026-12-01",
+      "enrollmentDate": "06/11/2026",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Zaid Al-Mansoor",
+      "fatherName": "Tariq Al-Mansoor",
+      "grade": "",
+      "studentEmail": "zaid@pw.live",
+      "parentEmail": "tariq@gmail.com",
+      "parentPhone": "971501234567",
+      "originCountry": "",
+      "countryOfResidence": "United Arab Emirates",
+      "city": "Dubai",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": false,
+      "parentLegalSignature": ""
+    },
+    "audit": {
+      "counsellorIp": "::1",
+      "counsellorUserAgent": "node",
+      "counsellorCreatedAtIST": "06/11/2026, 04:11:08 pm IST",
+      "authenticityStatus": "PENDING_PARENT",
+      "authenticityBadge": "Awaiting Parent Signature",
+      "auditNotes": "Booking initiated by counsellor from IP: ::1"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": false,
+      "parent": true,
+      "counsellor": true,
+      "support": false,
+      "timestamp": "2026-11-06T10:41:09.022Z",
+      "timestampIST": "06/11/2026, 04:11:08 pm IST",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": true,
+      "timestamp": "2026-11-06T10:41:12.070Z",
+      "timestampIST": "06/11/2026, 04:11:08 pm IST"
+    }
+  },
+  {
     "id": "PWG-2026-5771",
     "token": "tok_TZDBboMwDIZfJcq5tAkloOW0qoeql6kCpEm7VB5khalAlECnadq7zyadSi6__SW2f-eHt1zz0-shikWcRirLJF9x3yPcgYMbK40fkXwQyeHT-OYfXRyig4PaMDkXGcyBip7t1_ra3gxCS9CCM_24pA3Sp0wqIeNtotIM2VAhQ62oLSkZI_VB38lBsSvZyRmLOXxjjqbV7JyaBj_DRLcXmrAfOns1o2H7YXJoD5tZrpXAg3YxTEIIj7AGrknq-_AJ9fiS03rUPh8a6FnRgOtgXvncIXVEF-t5qhbpRsrN3VvlzmOwm0ZSRiItpdAy0UKs40S9hRctfuuybsXEVif0iNmOHYuS__4B",
     "createdAt": "2026-11-06T10:14:00.245Z",
