@@ -15,7 +15,7 @@ const defaultSettings: AppSettings = {
   smtpPass: process.env.SMTP_PASS || '',
   smtpFrom: process.env.SMTP_FROM || 'PW Global Admissions <noreply@pw.live>',
   supportEmail: process.env.PW_GLOBAL_SUPPORT_EMAIL || PW_GLOBAL_DEFAULT_SUPPORT_EMAIL,
-  googleSheetWebhookUrl: process.env.GOOGLE_SHEET_WEBHOOK_URL || '',
+  googleSheetWebhookUrl: process.env.GOOGLE_SHEET_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbwpb2aS5d6qttGkBzjcuHE8zeyH6XupIPlE-HXGPfyKS1LzFzOG551MPbnoWz_PVaAuvQ/exec',
   googleSheetId: process.env.GOOGLE_SHEET_ID || ''
 };
 

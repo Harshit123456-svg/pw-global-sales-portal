@@ -31,7 +31,7 @@ export default function HomePage() {
     smtpPass: '',
     smtpFrom: '',
     supportEmail: 'pwglobal_support@pw.live',
-    googleSheetWebhookUrl: ''
+    googleSheetWebhookUrl: 'https://script.google.com/macros/s/AKfycbwpb2aS5d6qttGkBzjcuHE8zeyH6XupIPlE-HXGPfyKS1LzFzOG551MPbnoWz_PVaAuvQ/exec'
   });
   const [copiedScript, setCopiedScript] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');

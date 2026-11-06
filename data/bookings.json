@@ -4,7 +4,7 @@
     "token": "tok_TZDBboMwDIZfJcq5tAkloOW0qoeql6kCpEm7VB5khalAlECnadq7zyadSi6__SW2f-eHt1zz0-shikWcRirLJF9x3yPcgYMbK40fkXwQyeHT-OYfXRyig4PaMDkXGcyBip7t1_ra3gxCS9CCM_24pA3Sp0wqIeNtotIM2VAhQ62oLSkZI_VB38lBsSvZyRmLOXxjjqbV7JyaBj_DRLcXmrAfOns1o2H7YXJoD5tZrpXAg3YxTEIIj7AGrknq-_AJ9fiS03rUPh8a6FnRgOtgXvncIXVEF-t5qhbpRsrN3VvlzmOwm0ZSRiItpdAy0UKs40S9hRctfuuybsXEVif0iNmOHYuS__4B",
     "createdAt": "2026-11-06T10:14:00.245Z",
     "createdAtIST": "06/11/2026, 03:44:00 pm IST",
-    "updatedAt": "2026-11-06T10:14:00.276Z",
+    "updatedAt": "2026-11-06T10:20:45.911Z",
     "updatedAtIST": "06/11/2026, 03:44:00 pm IST",
     "status": "pending_parent_fill",
     "fillMode": "counsellor_direct",
@@ -78,10 +78,8 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-06T10:14:00.275Z",
-      "timestampIST": "06/11/2026, 03:44:00 pm IST",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:45.910Z"
     }
   },
   {
@@ -89,7 +87,7 @@
     "token": "tok_eJyNVE2P2jAQ_SvRnMNuQhfU9amUUsphWURYVe2l8joDWHVsa-yUohX_vbLzQdBeenL85nlm3vM4byBLYLD5vhyNs_F0NJ1OPkIKgpB7LGceGEQ8z0fZdJc9socpmzzejSfjn0PaqtgBg2x6n-f3gZ8m2QeWB2piqyREU3jlXhzXvEJgUMx2yYbQQgqOK3TA3pqPLVpCh9pzL_8E5hZtkodSptYOlTK0qLhUwIDQfrKnOxV4w_jmaHQ42eb-wj3e9AaXFCyZA_EqlOWCl1hJ8QM5NWon0QroWQUqFF4aDQyWZOrQ9SGs30xNDhjMTWUVekzmAWi7IYeF5-Tb-j240OUVsmTKWviFJqMUlkNnQpf8XKH2ocvm7IakQGCTLMuyFJxRZYs8NEgpXfDBA8tvgQ2SiJnGWQqiJkItzsBgtd5CCvtaqVkVeTyOwxkdpMAHUFegxoYIrNldpWDUEPp973gv5cmUIfSsldSYbFp9KXji2vFo8hb3IeElBefrspWvm7HZofPJi0MKTXN_RFoPAl8jEi-HxzLLsCZ5Bn2ubnY8Oj8YHstpEOyBwSQZkgep50E6nfvrDJvn_RadLFGL7pql7xjRaF-IozFt4sqI36HZQhhq-Z7TAd8Di7-8ejLaH29Z11T2aLx5IdW5VVtrqBGxRSGtjN6BPR2UeeXqV0sYyOZ1Kbvpah_PygIDxm5fXHB8dmjSfSZzai7gGp___2_gcvkHsFZsBA",
     "createdAt": "2026-11-06T09:46:59.252Z",
     "createdAtIST": "06/11/2026, 03:16:59 pm IST",
-    "updatedAt": "2026-11-06T09:46:59.492Z",
+    "updatedAt": "2026-11-06T10:20:48.215Z",
     "updatedAtIST": "06/11/2026, 03:16:59 pm IST",
     "status": "completed",
     "fillMode": "counsellor_direct",
@@ -168,10 +166,8 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-06T09:46:59.491Z",
-      "timestampIST": "06/11/2026, 03:16:59 pm IST",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:48.214Z"
     }
   },
   {
@@ -179,7 +175,7 @@
     "token": "tok_eJyVVMtu2zAQ_BVhr1UcSY4chKe4jpHmkNSwnRbtpdhQa4stRQpLKqkR-N8L6uHYCAq0J4nD0ezOcqhXUAUIWHy9PcuSbHI2Hl9dQQySCT0VUw8CWjxNz5J8nWUizUQ-GU0u8-_HtLvVGgQkk_M0PQ_8OErG4iJQI6yisBvDE3pZPmBFIGA1XUfn0Y3aKo86CquZrWpNnqIFUx1lSZa3DUEMDjU5EK_dy5JqJkfGo1fPQWppSzTRmpwPDdnGONLa8rxCpUEAh-3r-mWkA_2YsSitCQJ9iRv0dOIB9jHUbLeMVaiOEguqlPxGyN1UDh32rBVpkl5ZAwJu2TY1xLANz0-2YQcCDh5nAei7YUcrj-z7-gdwboo3qGZbNNLPDVutqfivCQYbuKvI-GCjE1-wkgRikiRJEoOzuuiRi7xFCuXCoDyI9BRYEMtWKctjkA0zGbkDAXcPS4hh02g9rVoetrnakYMY8AgaCjTUEUF0qzev1JoM_b4_koOVe1uErc9GK0PRovcXg2c0DttTWNImCO5jcL4pevumy98UGZ-jL8GMHrKzQV8S9wFd4k9yZc9ozxHbgrfhGaUpHFSHoGGQHD23H1x7cn4kbdU2zEcsbnX_Shsy-eHqMs2TNBtf5JNLiMGy2iozCwPj3SElYfF5sySnCjJySI_yA6M9Hr-SpbW6gyorfwW7K2m553vkLb0H5r-xurfGl6esN6m6tN4-sh5m3NS15c7nkqSqVTtxqF-22j6h_tETjq4iNoUaMtnfybsaBAiRnlzUR0c83XZyH9m-OOKT_dm__4X2-z9M8pQC",
     "createdAt": "2026-11-05T22:12:56.675Z",
     "createdAtIST": "06/11/2026, 03:42:56 am IST",
-    "updatedAt": "2026-11-05T22:12:56.705Z",
+    "updatedAt": "2026-11-06T10:20:51.034Z",
     "updatedAtIST": "06/11/2026, 03:42:56 am IST",
     "status": "pending_parent_fill",
     "fillMode": "counsellor_direct",
@@ -253,10 +249,8 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T22:12:56.704Z",
-      "timestampIST": "06/11/2026, 03:42:56 am IST",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:51.032Z"
     }
   },
   {
@@ -264,7 +258,7 @@
     "token": "tok_wgyel3jrmw4085tb",
     "createdAt": "2026-11-05T20:34:50.351Z",
     "createdAtIST": "06/11/2026, 02:04:50 am IST",
-    "updatedAt": "2026-11-05T20:34:50.392Z",
+    "updatedAt": "2026-11-06T10:20:53.216Z",
     "updatedAtIST": "06/11/2026, 02:04:50 am IST",
     "status": "completed",
     "fillMode": "counsellor_direct",
@@ -343,10 +337,8 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:34:50.390Z",
-      "timestampIST": "06/11/2026, 02:04:50 am IST",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:53.214Z"
     }
   },
   {
@@ -354,7 +346,7 @@
     "token": "tok_78hb003xmw407xp7",
     "createdAt": "2026-11-05T20:34:39.835Z",
     "createdAtIST": "06/11/2026, 02:04:39 am IST",
-    "updatedAt": "2026-11-05T20:34:40.044Z",
+    "updatedAt": "2026-11-06T10:20:55.152Z",
     "updatedAtIST": "06/11/2026, 02:04:40 am IST",
     "status": "completed",
     "fillMode": "counsellor_direct",
@@ -433,17 +425,15 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:34:40.043Z",
-      "timestampIST": "06/11/2026, 02:04:40 am IST",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:55.150Z"
     }
   },
   {
     "id": "PWG-2026-9070",
     "token": "tok_v8x0hcxkmw3zy4zq",
     "createdAt": "2026-11-05T20:27:02.726Z",
-    "updatedAt": "2026-11-05T20:27:35.882Z",
+    "updatedAt": "2026-11-06T10:20:57.347Z",
     "status": "completed",
     "fillMode": "counsellor_direct",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -508,16 +498,15 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:27:35.881Z",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:20:57.345Z"
     }
   },
   {
     "id": "PWG-2026-7861",
     "token": "tok_xrumcp2nmw3zx0g1",
     "createdAt": "2026-11-05T20:26:10.177Z",
-    "updatedAt": "2026-11-05T20:26:10.308Z",
+    "updatedAt": "2026-11-06T10:21:00.825Z",
     "status": "completed",
     "fillMode": "counsellor_direct",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -582,16 +571,15 @@
       "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:26:10.308Z",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:00.824Z"
     }
   },
   {
     "id": "PWG-2026-3733",
     "token": "tok_bzipuqqpmw3zoyxi",
     "createdAt": "2026-11-05T20:19:54.966Z",
-    "updatedAt": "2026-11-05T20:19:54.966Z",
+    "updatedAt": "2026-11-06T10:21:03.122Z",
     "status": "completed",
     "fillMode": "counsellor_direct",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -656,16 +644,15 @@
       "error": "SMTP not configured yet. Set SMTP credentials in Settings to dispatch live emails directly to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:19:54.973Z",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:03.121Z"
     }
   },
   {
     "id": "PWG-2026-1810",
     "token": "tok_erwp3cf9mw3zm8rm",
     "createdAt": "2026-11-05T20:17:47.746Z",
-    "updatedAt": "2026-11-05T20:17:47.852Z",
+    "updatedAt": "2026-11-06T10:21:04.951Z",
     "status": "completed",
     "fillMode": "parent_link",
     "batchName": "SAT Ivy Global Accelerator 2026",
@@ -730,16 +717,15 @@
       "error": "SMTP not configured yet. Set SMTP credentials in Settings to dispatch live emails directly to parent inboxes."
     },
     "googleSheetSync": {
-      "synced": false,
-      "timestamp": "2026-11-05T20:17:47.851Z",
-      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:04.949Z"
     }
   },
   {
     "id": "PWG-2026-6863",
     "token": "tok_lg4715pqmw3yowii",
     "createdAt": "2026-11-05T19:51:52.218Z",
-    "updatedAt": "2026-11-05T19:51:52.218Z",
+    "updatedAt": "2026-11-06T10:21:07.135Z",
     "status": "pending_parent_fill",
     "fillMode": "parent_link",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -782,13 +768,17 @@
       "parent": false,
       "counsellor": false,
       "support": false
+    },
+    "googleSheetSync": {
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:07.133Z"
     }
   },
   {
     "id": "PWG-2026-6062",
     "token": "tok_7uwpt7tlmw3ymalt",
     "createdAt": "2026-11-05T19:49:50.513Z",
-    "updatedAt": "2026-11-05T19:49:50.513Z",
+    "updatedAt": "2026-11-06T10:21:09.041Z",
     "status": "completed",
     "fillMode": "counsellor_direct",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -832,13 +822,17 @@
       "counsellor": true,
       "support": true,
       "timestamp": "2026-11-05T19:49:50.513Z"
+    },
+    "googleSheetSync": {
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:09.040Z"
     }
   },
   {
     "id": "PWG-2026-3287",
     "token": "tok_rzz9sh04mw3yezvu",
     "createdAt": "2026-11-05T19:44:10.026Z",
-    "updatedAt": "2026-11-05T19:44:10.078Z",
+    "updatedAt": "2026-11-06T10:21:11.846Z",
     "status": "completed",
     "fillMode": "parent_link",
     "batchName": "JEE Main + Advanced (Global NRI Batch - 11th)",
@@ -882,13 +876,17 @@
       "counsellor": true,
       "support": true,
       "timestamp": "2026-11-05T19:44:10.077Z"
+    },
+    "googleSheetSync": {
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:11.845Z"
     }
   },
   {
     "id": "PWG-2026-1091",
     "token": "tok_he7flb9vmw3yeqcq",
     "createdAt": "2026-11-05T19:43:57.674Z",
-    "updatedAt": "2026-11-05T19:43:57.674Z",
+    "updatedAt": "2026-11-06T10:21:13.994Z",
     "status": "completed",
     "fillMode": "counsellor_direct",
     "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
@@ -932,6 +930,10 @@
       "counsellor": true,
       "support": true,
       "timestamp": "2026-11-05T19:43:57.745Z"
+    },
+    "googleSheetSync": {
+      "synced": true,
+      "timestamp": "2026-11-06T10:21:13.992Z"
     }
   }
 ]
