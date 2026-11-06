@@ -3,26 +3,40 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Link as LinkIcon, Copy, Check, MessageSquare, ExternalLink, 
-  Sparkles, AlertCircle, EyeOff, Plus 
+  Sparkles, AlertCircle, EyeOff, Plus, Mail 
 } from 'lucide-react';
 import { 
   CURRENCIES, LEAD_SOURCES, ACADEMIC_YEARS, PROGRAM_TYPES, 
   GROUP_HOURS_OPTIONS, PW_GLOBAL_DEFAULT_SUPPORT_EMAIL 
 } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
+import { PhoneInput } from '@/components/PhoneInput';
 
 interface ParentShareGeneratorProps {
   onCreated?: (booking: BookingRecord) => void;
+  sharedBatches?: string[];
+  onAddBatch?: (batch: string) => void;
 }
 
-export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCreated }) => {
+export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ 
+  onCreated,
+  sharedBatches,
+  onAddBatch
+}) => {
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  // Batches
-  const [batches, setBatches] = useState<string[]>([]);
-  const [productEnrolled, setProductEnrolled] = useState('');
+  // Batches (synced with global batches)
+  const [batches, setBatches] = useState<string[]>(sharedBatches || []);
+  const [productEnrolled, setProductEnrolled] = useState(sharedBatches?.[0] || '');
   const [isAddingNewBatch, setIsAddingNewBatch] = useState(false);
   const [newBatchInput, setNewBatchInput] = useState('');
+
+  useEffect(() => {
+    if (sharedBatches && sharedBatches.length > 0) {
+      setBatches(sharedBatches);
+      if (!productEnrolled) setProductEnrolled(sharedBatches[0]);
+    }
+  }, [sharedBatches]);
 
   // Counsellor & Sales Info
   const [salesRepresentative, setSalesRepresentative] = useState('');
@@ -108,22 +122,29 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
   }, [fullAmountPaid, dueDate, maxDueDate]);
 
   const handleAddNewBatch = async () => {
-    if (!newBatchInput.trim()) return;
+    const clean = newBatchInput.trim();
+    if (!clean) return;
+    if (onAddBatch) {
+      onAddBatch(clean);
+    }
     try {
       const res = await fetch('/api/batches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batchName: newBatchInput.trim() })
+        body: JSON.stringify({ batchName: clean })
       });
       const data = await res.json();
       if (data.success && data.batches) {
         setBatches(data.batches);
-        setProductEnrolled(data.batch);
+        setProductEnrolled(data.batch || clean);
         setIsAddingNewBatch(false);
         setNewBatchInput('');
       }
     } catch (err) {
-      alert('Failed to add new batch');
+      console.warn('Failed to add batch to server, saved locally:', err);
+      setProductEnrolled(clean);
+      setIsAddingNewBatch(false);
+      setNewBatchInput('');
     }
   };
 
@@ -220,6 +241,30 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const [copiedMessage, setCopiedMessage] = useState(false);
+
+  const getWhatsAppMessageRaw = () => {
+    if (!generatedBooking) return '';
+    const url = getShareUrl();
+    const batch = generatedBooking.program?.productEnrolled || generatedBooking.batchName;
+    return `Dear Parent,\n\nGreetings from PhysicsWallah Global!\n\nWe have successfully received your payment for ${batch}.\n\nPlease complete your student's official onboarding & portal access form here:\n${url}\n\nImportant: You will be asked to confirm your student access email and digitally sign the admission terms.\n\nThank you,\n${generatedBooking.sales.salesRepresentative} (PW Global Admissions)`;
+  };
+
+  const handleCopyWhatsAppMessage = () => {
+    navigator.clipboard.writeText(getWhatsAppMessageRaw());
+    setCopiedMessage(true);
+    setTimeout(() => setCopiedMessage(false), 2500);
+  };
+
+  const getGmailShareUrl = () => {
+    if (!generatedBooking) return '';
+    const to = encodeURIComponent(generatedBooking.student.parentEmail || '');
+    const batch = generatedBooking.program?.productEnrolled || generatedBooking.batchName;
+    const subject = encodeURIComponent(`[Action Required] Review & Sign Admission Terms: ${generatedBooking.student.name || 'Student'} (${batch}) - Ref: ${generatedBooking.id}`);
+    const body = encodeURIComponent(getWhatsAppMessageRaw());
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+  };
+
   const getWhatsAppShareUrl = () => {
     if (!generatedBooking) return '';
     const url = getShareUrl();
@@ -227,8 +272,11 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
     const text = encodeURIComponent(
       `Dear Parent,\n\nGreetings from PhysicsWallah Global!\n\nWe have successfully received your payment for *${batch}*.\n\nPlease complete your student's official onboarding & portal access form here:\n${url}\n\n⚠️ Important: You will be asked to confirm your student access email and digitally sign the admission terms.\n\nThank you,\n${generatedBooking.sales.salesRepresentative} (PW Global Admissions)`
     );
-    const phone = generatedBooking.student.parentPhone?.replace(/[^0-9]/g, '');
-    return phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
+    const cleanDigits = (generatedBooking.student.parentPhone || '').replace(/\D/g, '');
+    if (cleanDigits.length >= 7) {
+      return `https://api.whatsapp.com/send?phone=${cleanDigits}&text=${text}`;
+    }
+    return `https://api.whatsapp.com/send?text=${text}`;
   };
 
   return (
@@ -290,22 +338,44 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2 pt-2">
             <a
               href={getWhatsAppShareUrl()}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-extrabold transition shadow-md"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-extrabold transition shadow-md"
             >
               <MessageSquare className="w-4 h-4 fill-current" />
-              <span>Share Directly via WhatsApp</span>
+              <span>Share on WhatsApp</span>
             </a>
+
+            <button
+              type="button"
+              onClick={handleCopyWhatsAppMessage}
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition border border-slate-300"
+            >
+              {copiedMessage ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedMessage ? 'Copied Message!' : 'Copy WhatsApp Message'}</span>
+            </button>
+
+            {generatedBooking.student.parentEmail && (
+              <a
+                href={getGmailShareUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                title="Opens Gmail compose window with parent email, subject and signing link pre-filled"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Send via Gmail (1-Click)</span>
+              </a>
+            )}
 
             <a
               href={`/parent/${generatedBooking.token}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
             >
               <ExternalLink className="w-4 h-4" />
               <span>Preview Parent View</span>
@@ -314,7 +384,7 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
             <button
               type="button"
               onClick={() => setGeneratedBooking(null)}
-              className="px-4 py-3 text-slate-500 hover:text-slate-800 text-xs font-bold"
+              className="px-4 py-2.5 text-slate-500 hover:text-slate-800 text-xs font-bold"
             >
               + Generate Another Link
             </button>
@@ -638,14 +708,11 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({ onCr
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Parent WhatsApp / Phone</label>
-                <input
-                  type="tel"
+              <div className="sm:col-span-1">
+                <PhoneInput
+                  label="Parent WhatsApp / Mobile"
                   value={parentPhone}
-                  onChange={(e) => setParentPhone(e.target.value)}
-                  placeholder="+971 / +91 / +1 XXXXXXXXXX"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900"
+                  onChange={(val) => setParentPhone(val)}
                 />
               </div>
             </div>

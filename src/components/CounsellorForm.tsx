@@ -12,20 +12,34 @@ import {
   PW_GLOBAL_DEFAULT_SUPPORT_EMAIL 
 } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
+import { PhoneInput } from '@/components/PhoneInput';
 import confetti from 'canvas-confetti';
 
 interface CounsellorFormProps {
   onSuccess?: (booking: BookingRecord) => void;
+  sharedBatches?: string[];
+  onAddBatch?: (batch: string) => void;
 }
 
-export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => {
+export const CounsellorForm: React.FC<CounsellorFormProps> = ({ 
+  onSuccess,
+  sharedBatches,
+  onAddBatch
+}) => {
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  // Batches state (fetched from backend to maintain uniformity)
-  const [batches, setBatches] = useState<string[]>([]);
-  const [selectedBatch, setSelectedBatch] = useState('');
+  // Batches state (synced globally across tabs)
+  const [batches, setBatches] = useState<string[]>(sharedBatches || []);
+  const [selectedBatch, setSelectedBatch] = useState(sharedBatches?.[0] || '');
   const [isAddingNewBatch, setIsAddingNewBatch] = useState(false);
   const [newBatchInput, setNewBatchInput] = useState('');
+
+  useEffect(() => {
+    if (sharedBatches && sharedBatches.length > 0) {
+      setBatches(sharedBatches);
+      if (!selectedBatch) setSelectedBatch(sharedBatches[0]);
+    }
+  }, [sharedBatches]);
 
   // Form State: Sales & Counsellor
   const [salesRepresentative, setSalesRepresentative] = useState('');
@@ -74,6 +88,7 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => 
   const [completedBooking, setCompletedBooking] = useState<BookingRecord | null>(null);
   const [parentSigningUrl, setParentSigningUrl] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedMessage, setCopiedMessage] = useState(false);
 
   // Fetch batches on mount
   useEffect(() => {
@@ -162,22 +177,29 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => 
 
   // Add new uniform batch
   const handleAddNewBatch = async () => {
-    if (!newBatchInput.trim()) return;
+    const clean = newBatchInput.trim();
+    if (!clean) return;
+    if (onAddBatch) {
+      onAddBatch(clean);
+    }
     try {
       const res = await fetch('/api/batches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batchName: newBatchInput.trim() })
+        body: JSON.stringify({ batchName: clean })
       });
       const data = await res.json();
       if (data.success && data.batches) {
         setBatches(data.batches);
-        setSelectedBatch(data.batch);
+        setSelectedBatch(data.batch || clean);
         setIsAddingNewBatch(false);
         setNewBatchInput('');
       }
     } catch (err) {
-      alert('Failed to add new batch name');
+      console.warn('Failed to add batch to server, saved locally:', err);
+      setSelectedBatch(clean);
+      setIsAddingNewBatch(false);
+      setNewBatchInput('');
     }
   };
 
@@ -308,11 +330,35 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => 
 
   const getWhatsAppShareUrl = () => {
     if (!completedBooking) return '';
+    const cleanDigits = (completedBooking.student.parentPhone || '').replace(/\D/g, '');
     const text = encodeURIComponent(
       `Dear ${completedBooking.student.fatherName || 'Parent'},\n\nGreetings from PhysicsWallah Global!\n\nYour sales representative, *${completedBooking.sales.salesRepresentative}*, has prepared the admission for *${completedBooking.student.name}* in *${completedBooking.batchName}*.\n\n⚠️ Action Required: Please click the official link below to review your student details, accept the Admission Rules, and digitally sign the document:\n${parentSigningUrl}\n\nNote: The enrollment will only be confirmed once you digitally sign the document.\n\nThank you,\nPhysicsWallah Global Admissions`
     );
-    const phone = completedBooking.student.parentPhone?.replace(/[^0-9]/g, '');
-    return phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
+    if (cleanDigits.length >= 7) {
+      return `https://api.whatsapp.com/send?phone=${cleanDigits}&text=${text}`;
+    }
+    return `https://api.whatsapp.com/send?text=${text}`;
+  };
+
+  const getWhatsAppMessageRaw = () => {
+    if (!completedBooking) return '';
+    return `Dear ${completedBooking.student.fatherName || 'Parent'},\n\nGreetings from PhysicsWallah Global!\n\nYour sales representative, ${completedBooking.sales.salesRepresentative}, has prepared the admission for ${completedBooking.student.name} in ${completedBooking.batchName}.\n\nAction Required: Please click the link below to review student details, accept Admission Rules, and digitally sign:\n${parentSigningUrl}\n\nThank you,\nPhysicsWallah Global Admissions`;
+  };
+
+  const handleCopyWhatsAppMessage = () => {
+    navigator.clipboard.writeText(getWhatsAppMessageRaw());
+    setCopiedMessage(true);
+    setTimeout(() => setCopiedMessage(false), 2500);
+  };
+
+  const getGmailShareUrl = () => {
+    if (!completedBooking || !completedBooking.student.parentEmail) return '';
+    const to = encodeURIComponent(completedBooking.student.parentEmail);
+    const subject = encodeURIComponent(`[Action Required] Review & Sign Admission Terms: ${completedBooking.student.name} (${completedBooking.batchName}) - Ref: ${completedBooking.id}`);
+    const body = encodeURIComponent(
+      `Dear ${completedBooking.student.fatherName || 'Parent'},\n\nGreetings from PhysicsWallah Global!\n\nWe have received your enrollment booking for ${completedBooking.student.name} in ${completedBooking.batchName}.\n\nPlease click the official link below to complete the student onboarding details, accept the Admission Rules, and digitally sign the document:\n${parentSigningUrl}\n\n⚠️ Crucial Portal Access Policy: The access email provided for the student portal cannot be changed later under any circumstances.\n\nThank you,\n${completedBooking.sales.salesRepresentative}\nPhysicsWallah Global Admissions`
+    );
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
   };
 
   const handleReset = () => {
@@ -392,25 +438,47 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => 
 
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <a
                 href={getWhatsAppShareUrl()}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-extrabold transition shadow-md"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-extrabold transition shadow-md"
               >
                 <MessageSquare className="w-4 h-4 fill-current" />
-                <span>Share Link on WhatsApp</span>
+                <span>Share on WhatsApp</span>
               </a>
+
+              <button
+                type="button"
+                onClick={handleCopyWhatsAppMessage}
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition border border-slate-300"
+              >
+                {copiedMessage ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedMessage ? 'Copied Message!' : 'Copy WhatsApp Message'}</span>
+              </button>
+
+              {completedBooking.student.parentEmail && (
+                <a
+                  href={getGmailShareUrl()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                  title="Opens Gmail compose window with parent email, subject and signing link pre-filled"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Send via Gmail (1-Click)</span>
+                </a>
+              )}
 
               <a
                 href={parentSigningUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Open Parent Signing Form</span>
+                <span>Open Parent Form</span>
               </a>
             </div>
 
@@ -715,17 +783,12 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({ onSuccess }) => 
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Parent WhatsApp / Phone *</label>
-            <input
-              type="tel"
-              required
-              value={parentPhone}
-              onChange={(e) => setParentPhone(e.target.value)}
-              placeholder="+971 / +91 / +1 XXXXXXXXXX"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900"
-            />
-          </div>
+          <PhoneInput
+            label="Parent WhatsApp / Mobile No."
+            required
+            value={parentPhone}
+            onChange={(val) => setParentPhone(val)}
+          />
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Origin Country</label>

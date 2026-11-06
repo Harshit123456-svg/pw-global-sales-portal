@@ -7,6 +7,7 @@ import { ParentShareGenerator } from '@/components/ParentShareGenerator';
 import { BookingsTable } from '@/components/BookingsTable';
 import { BookingRecord, AppSettings } from '@/lib/types';
 import { GOOGLE_APPS_SCRIPT_TEMPLATE } from '@/lib/googleSheetTemplate';
+import { INITIAL_BATCHES } from '@/lib/constants';
 import { 
   Settings, Mail, Sheet, Check, Copy, AlertCircle, 
   Send, Sparkles, X, ExternalLink, ShieldCheck, RefreshCw, Globe, HelpCircle 
@@ -17,6 +18,9 @@ export default function HomePage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [loading, setLoading] = useState(false);
   
+  // Global Batches State (Shared across all tabs)
+  const [batches, setBatches] = useState<string[]>(INITIAL_BATCHES);
+
   // Settings Modal State
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'sheets' | 'email' | 'publish'>('sheets');
@@ -98,10 +102,49 @@ export default function HomePage() {
     }
   }, [testEmailAddress]);
 
+  const fetchBatches = useCallback(async () => {
+    try {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('pw_local_batches');
+        if (cached) {
+          const list = JSON.parse(cached);
+          if (Array.isArray(list) && list.length > 0) {
+            setBatches(prev => Array.from(new Set([...INITIAL_BATCHES, ...prev, ...list])));
+          }
+        }
+      }
+      const res = await fetch('/api/batches');
+      const data = await res.json();
+      if (data.success && data.batches?.length > 0) {
+        setBatches(prev => {
+          const merged = Array.from(new Set([...INITIAL_BATCHES, ...prev, ...data.batches]));
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('pw_local_batches', JSON.stringify(merged));
+          }
+          return merged;
+        });
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleAddBatch = (newBatch: string) => {
+    const clean = newBatch.trim();
+    if (!clean) return;
+    setBatches(prev => {
+      if (prev.includes(clean)) return prev;
+      const updated = [...prev, clean];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pw_local_batches', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
   useEffect(() => {
     fetchBookings();
     loadSettings();
-  }, [fetchBookings, loadSettings]);
+    fetchBatches();
+  }, [fetchBookings, loadSettings, fetchBatches]);
 
   const handleBookingCreated = (newBooking: BookingRecord) => {
     setBookings(prev => {
@@ -257,11 +300,19 @@ export default function HomePage() {
         {/* Tab Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {activeTab === 'counsellor' && (
-            <CounsellorForm onSuccess={handleBookingCreated} />
+            <CounsellorForm 
+              onSuccess={handleBookingCreated} 
+              sharedBatches={batches}
+              onAddBatch={handleAddBatch}
+            />
           )}
 
           {activeTab === 'share' && (
-            <ParentShareGenerator onCreated={handleBookingCreated} />
+            <ParentShareGenerator 
+              onCreated={handleBookingCreated} 
+              sharedBatches={batches}
+              onAddBatch={handleAddBatch}
+            />
           )}
 
           {activeTab === 'records' && (

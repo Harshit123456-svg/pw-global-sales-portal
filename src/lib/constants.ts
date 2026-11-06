@@ -122,12 +122,12 @@ export const ADMISSION_TERMS_AND_CONDITIONS = [
   {
     number: '3',
     title: 'Overdue Accounts & Access Suspension',
-    text: "The student's batch access, portal availability, and learning resources will be automatically revoked if any fee instalment remains unpaid 02 calendar days past its due date."
+    text: "The student's batch access, portal availability, and learning resources will be automatically revoked if any fee instalment remains unpaid 05 calendar days past its due date."
   },
   {
     number: '4',
     title: 'Differential Fee Structure',
-    text: 'We acknowledge that Physics Wallah Gulf reserves the right to apply variable fee structures or merit-based fee adjustments based on the student\'s academic performance and marks obtained.'
+    text: 'We acknowledge that Physicswallah Limited reserves the right to apply variable fee structures or merit-based fee adjustments based on the student\'s academic performance and marks obtained.'
   },
   {
     number: '5',
@@ -142,17 +142,17 @@ export const ADMISSION_TERMS_AND_CONDITIONS = [
   {
     number: '7',
     title: 'Schedule & Timetable Adjustments',
-    text: 'We understand and agree that Physics Wallah Gulf reserves the right to modify class schedules, batch timings, or timetables as necessary to fulfill course demands.'
+    text: 'We understand and agree that Physicswallah Limited reserves the right to modify class schedules, batch timings, or timetables as necessary to fulfill course demands.'
   },
   {
     number: '8',
     title: 'Celebrating Our Students',
-    text: "Physics Wallah Gulf takes pride in celebrating the achievements of its students. We may, from time to time, feature the student's name, photograph, and academic accomplishments in our institutional communications, newsletters, and marketing materials in celebration of their success. This is done at no cost and without any financial or legal claim on the part of the parent or student."
+    text: "Physicswallah Limited takes pride in celebrating the achievements of its students. We may, from time to time, feature the student's name, photograph, and academic accomplishments in our institutional communications, newsletters, and marketing materials in celebration of their success. This is done at no cost and without any financial or legal claim on the part of the parent or student."
   },
   {
     number: '9',
     title: 'Programme-Specific Enrolment',
-    text: "Enrolment and fees paid toward a Physics Wallah Gulf programme apply exclusively to that programme. As Physics Wallah Gulf operates as an independent regional entity with its own fee structure and systems, amounts paid cannot be transferred, converted, or credited toward enrolment in any other Physics Wallah platform or affiliate, including Physics Wallah's India-based platforms, even where operated under the same parent group."
+    text: "Enrolment and fees paid toward a Physicswallah Limited programme apply exclusively to that programme. As Physicswallah Limited operates as an independent entity with its own fee structure and systems, amounts paid cannot be transferred, converted, or credited toward enrolment in any other Physics Wallah platform or affiliate, including Physics Wallah's India-based platforms, even where operated under the same parent group."
   },
   {
     number: '10',

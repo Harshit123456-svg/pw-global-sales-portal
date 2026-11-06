@@ -1,5 +1,180 @@
 [
   {
+    "id": "PWG-2026-6658",
+    "token": "tok_eJyNVE2P2jAQ_SvRnMNuQhfU9amUUsphWURYVe2l8joDWHVsa-yUohX_vbLzQdBeenL85nlm3vM4byBLYLD5vhyNs_F0NJ1OPkIKgpB7LGceGEQ8z0fZdJc9socpmzzejSfjn0PaqtgBg2x6n-f3gZ8m2QeWB2piqyREU3jlXhzXvEJgUMx2yYbQQgqOK3TA3pqPLVpCh9pzL_8E5hZtkodSptYOlTK0qLhUwIDQfrKnOxV4w_jmaHQ42eb-wj3e9AaXFCyZA_EqlOWCl1hJ8QM5NWon0QroWQUqFF4aDQyWZOrQ9SGs30xNDhjMTWUVekzmAWi7IYeF5-Tb-j240OUVsmTKWviFJqMUlkNnQpf8XKH2ocvm7IakQGCTLMuyFJxRZYs8NEgpXfDBA8tvgQ2SiJnGWQqiJkItzsBgtd5CCvtaqVkVeTyOwxkdpMAHUFegxoYIrNldpWDUEPp973gv5cmUIfSsldSYbFp9KXji2vFo8hb3IeElBefrspWvm7HZofPJi0MKTXN_RFoPAl8jEi-HxzLLsCZ5Bn2ubnY8Oj8YHstpEOyBwSQZkgep50E6nfvrDJvn_RadLFGL7pql7xjRaF-IozFt4sqI36HZQhhq-Z7TAd8Di7-8ejLaH29Z11T2aLx5IdW5VVtrqBGxRSGtjN6BPR2UeeXqV0sYyOZ1Kbvpah_PygIDxm5fXHB8dmjSfSZzai7gGp___2_gcvkHsFZsBA",
+    "createdAt": "2026-11-06T09:46:59.252Z",
+    "createdAtIST": "06/11/2026, 03:16:59 pm IST",
+    "updatedAt": "2026-11-06T09:46:59.492Z",
+    "updatedAtIST": "06/11/2026, 03:16:59 pm IST",
+    "status": "completed",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT Prep",
+    "sales": {
+      "salesRepresentative": "Rep 1",
+      "counsellorEmail": "rep@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Instagram",
+      "saleDate": "06/11/2026"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "",
+      "courseEndDate": "",
+      "productEnrolled": "SAT Prep"
+    },
+    "payment": {
+      "coursePrice": 50000,
+      "soldPrice": 40000,
+      "discount": 10000,
+      "discountPercent": 20,
+      "currency": "INR",
+      "fullAmountPaid": "yes",
+      "amountPaid": 40000,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "06/11/2026",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Test User",
+      "fatherName": "Test Father",
+      "grade": "Grade 10",
+      "studentEmail": "test@pw.live",
+      "parentEmail": "",
+      "parentPhone": "",
+      "originCountry": "",
+      "countryOfResidence": "UAE",
+      "city": "Dubai",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": true,
+      "parentLegalSignature": "Parent Signature",
+      "signedAt": "2026-11-06T09:46:59.480Z",
+      "signedAtIST": "06/11/2026, 03:16:59 pm IST"
+    },
+    "audit": {
+      "counsellorIp": "::1",
+      "counsellorUserAgent": "Browser",
+      "counsellorCreatedAtIST": "06/11/2026, 03:16:59 pm IST",
+      "authenticityStatus": "SAME_DEVICE_AS_COUNSELLOR",
+      "authenticityBadge": "⚠️ Same Network / IP as Counsellor",
+      "auditNotes": "Submitted from counsellor network IP (::1)",
+      "parentSubmitIp": "::1",
+      "parentSubmitUserAgent": "",
+      "parentDeviceType": "Desktop"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": true,
+      "parent": true,
+      "counsellor": true,
+      "support": true,
+      "timestamp": "2026-11-06T09:46:59.490Z",
+      "timestampIST": "06/11/2026, 03:16:59 pm IST",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-06T09:46:59.491Z",
+      "timestampIST": "06/11/2026, 03:16:59 pm IST",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
+    "id": "PWG-2026-3399",
+    "token": "tok_eJyVVMtu2zAQ_BVhr1UcSY4chKe4jpHmkNSwnRbtpdhQa4stRQpLKqkR-N8L6uHYCAq0J4nD0ezOcqhXUAUIWHy9PcuSbHI2Hl9dQQySCT0VUw8CWjxNz5J8nWUizUQ-GU0u8-_HtLvVGgQkk_M0PQ_8OErG4iJQI6yisBvDE3pZPmBFIGA1XUfn0Y3aKo86CquZrWpNnqIFUx1lSZa3DUEMDjU5EK_dy5JqJkfGo1fPQWppSzTRmpwPDdnGONLa8rxCpUEAh-3r-mWkA_2YsSitCQJ9iRv0dOIB9jHUbLeMVaiOEguqlPxGyN1UDh32rBVpkl5ZAwJu2TY1xLANz0-2YQcCDh5nAei7YUcrj-z7-gdwboo3qGZbNNLPDVutqfivCQYbuKvI-GCjE1-wkgRikiRJEoOzuuiRi7xFCuXCoDyI9BRYEMtWKctjkA0zGbkDAXcPS4hh02g9rVoetrnakYMY8AgaCjTUEUF0qzev1JoM_b4_koOVe1uErc9GK0PRovcXg2c0DttTWNImCO5jcL4pevumy98UGZ-jL8GMHrKzQV8S9wFd4k9yZc9ozxHbgrfhGaUpHFSHoGGQHD23H1x7cn4kbdU2zEcsbnX_Shsy-eHqMs2TNBtf5JNLiMGy2iozCwPj3SElYfF5sySnCjJySI_yA6M9Hr-SpbW6gyorfwW7K2m553vkLb0H5r-xurfGl6esN6m6tN4-sh5m3NS15c7nkqSqVTtxqF-22j6h_tETjq4iNoUaMtnfybsaBAiRnlzUR0c83XZyH9m-OOKT_dm__4X2-z9M8pQC",
+    "createdAt": "2026-11-05T22:12:56.675Z",
+    "createdAtIST": "06/11/2026, 03:42:56 am IST",
+    "updatedAt": "2026-11-05T22:12:56.705Z",
+    "updatedAtIST": "06/11/2026, 03:42:56 am IST",
+    "status": "pending_parent_fill",
+    "fillMode": "counsellor_direct",
+    "batchName": "SAT / Digital SAT Complete Prep 2025-2026",
+    "sales": {
+      "salesRepresentative": "Rohan Test",
+      "counsellorEmail": "rohan@pw.live",
+      "counsellorPhone": "",
+      "sourceOfLead": "Secret Ad Campaign",
+      "saleDate": "06/11/2026"
+    },
+    "program": {
+      "academicYear": "2025-2026",
+      "programSelection": "Group",
+      "groupHours": "Complete Course",
+      "courseStartDate": "",
+      "courseEndDate": "",
+      "productEnrolled": "SAT / Digital SAT Complete Prep 2025-2026"
+    },
+    "payment": {
+      "coursePrice": 60000,
+      "soldPrice": 45000,
+      "discount": 15000,
+      "discountPercent": 25,
+      "currency": "INR",
+      "fullAmountPaid": "yes",
+      "amountPaid": 45000,
+      "dueAmount": 0,
+      "dueDate": "",
+      "enrollmentDate": "06/11/2026",
+      "paymentMode": "Online Payment",
+      "transactionRef": ""
+    },
+    "student": {
+      "name": "Aarav Vercel Test",
+      "fatherName": "Rajesh Vercel",
+      "grade": "Grade 11",
+      "studentEmail": "aarav.vercel@test.com",
+      "parentEmail": "rajesh.vercel@test.com",
+      "parentPhone": "+971501234567",
+      "originCountry": "",
+      "countryOfResidence": "",
+      "city": "",
+      "currentSchool": "",
+      "mockTestScore": "",
+      "targetScore": "",
+      "targetExamMonth": "",
+      "targetSchool": "",
+      "photoUrl": ""
+    },
+    "terms": {
+      "termsAccepted": false,
+      "parentLegalSignature": ""
+    },
+    "audit": {
+      "counsellorIp": "::1",
+      "counsellorUserAgent": "Browser",
+      "counsellorCreatedAtIST": "06/11/2026, 03:42:56 am IST",
+      "authenticityStatus": "PENDING_PARENT",
+      "authenticityBadge": "Awaiting Parent Signature",
+      "auditNotes": "Booking initiated by counsellor from IP: ::1"
+    },
+    "supportEmailRecipient": "pwglobal_support@pw.live",
+    "emailsSent": {
+      "student": false,
+      "parent": true,
+      "counsellor": true,
+      "support": false,
+      "timestamp": "2026-11-05T22:12:56.703Z",
+      "timestampIST": "06/11/2026, 03:42:56 am IST",
+      "error": "SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes."
+    },
+    "googleSheetSync": {
+      "synced": false,
+      "timestamp": "2026-11-05T22:12:56.704Z",
+      "timestampIST": "06/11/2026, 03:42:56 am IST",
+      "error": "Google Sheet Webhook URL is not configured. Add it in Settings."
+    }
+  },
+  {
     "id": "PWG-2026-6843",
     "token": "tok_wgyel3jrmw4085tb",
     "createdAt": "2026-11-05T20:34:50.351Z",

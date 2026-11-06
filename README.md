@@ -26,14 +26,14 @@ Official Admissions & Sales Portal for **PhysicsWallah Global (PW Global)** sale
    * Clearly displayed on Step 2 of the parent link with all 10 legal clauses:
      1. Academic Commitment & Rigor
      2. Payment Schedule Adherence
-     3. Overdue Accounts & Access Suspension (revocation 02 calendar days past due date)
+     3. Overdue Accounts & Access Suspension (revocation 05 calendar days past due date)
      4. Differential Fee Structure
      5. Refund Policy (strictly non-refundable)
      6. Notice of Discontinuation (to `pwglobal_support@pw.live`)
      7. Schedule & Timetable Adjustments
      8. Celebrating Our Students
-     11. Programme-Specific Enrolment (Physics Wallah Gulf regional entity terms)
-     12. PW Global corporate identity under PhysicsWallah Limited
+     9. Programme-Specific Enrolment (Physicswallah Limited entity terms)
+     10. Institutional Identity & Governance (Physicswallah Limited)
    * **Mandatory Agreement Checkbox**: The parent must check the agreement box. If not checked, the submit button is completely disabled.
    * **Digital Legal Signature**: Parent enters their full legal name as an electronic signature.
 5. **Direct Parent Email Delivery (SMTP)**:

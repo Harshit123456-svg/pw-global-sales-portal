@@ -36,12 +36,17 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const existing = getBookingById(params.id);
+    const body = await req.json();
+    let existing = getBookingById(params.id);
+
+    // Fallback: If not found in storage, but client supplied originalBooking (e.g. from state), use it!
+    if (!existing && body.originalBooking) {
+      existing = body.originalBooking;
+    }
+
     if (!existing) {
       return NextResponse.json({ success: false, error: 'Booking not found' }, { status: 404 });
     }
-
-    const body = await req.json();
     const wasPending = existing.status === 'pending_parent_fill';
     const nowBecomingComplete = body.status === 'completed';
     const nowIST = getNowIST();
@@ -141,25 +146,48 @@ export async function PUT(
 
     // If status became completed or user triggered email
     if ((wasPending && nowBecomingComplete) || body.triggerEmail) {
-      emailResult = await sendEnrollmentEmails(existing);
-      existing.emailsSent = {
-        student: emailResult.success,
-        parent: emailResult.success,
-        counsellor: emailResult.success,
-        support: emailResult.success,
-        timestamp: new Date().toISOString(),
-        timestampIST: nowIST,
-        error: emailResult.errors ? emailResult.errors.join('; ') : undefined,
-      };
+      try {
+        emailResult = await sendEnrollmentEmails(existing);
+        existing.emailsSent = {
+          student: emailResult?.success ?? false,
+          parent: emailResult?.success ?? false,
+          counsellor: emailResult?.success ?? false,
+          support: emailResult?.success ?? false,
+          timestamp: new Date().toISOString(),
+          timestampIST: nowIST,
+          error: emailResult?.errors ? emailResult.errors.join('; ') : undefined,
+        };
+      } catch (mailErr: any) {
+        console.warn('[Email] Non-blocking dispatch error:', mailErr);
+        existing.emailsSent = {
+          student: false,
+          parent: false,
+          counsellor: false,
+          support: false,
+          timestamp: new Date().toISOString(),
+          timestampIST: nowIST,
+          error: mailErr.message || 'SMTP sending error'
+        };
+      }
 
       // Trigger Google Sheet sync with IST timestamps
-      sheetResult = await syncBookingToGoogleSheet(existing);
-      existing.googleSheetSync = {
-        synced: sheetResult.synced,
-        timestamp: new Date().toISOString(),
-        timestampIST: nowIST,
-        error: sheetResult.error
-      };
+      try {
+        sheetResult = await syncBookingToGoogleSheet(existing);
+        existing.googleSheetSync = {
+          synced: sheetResult?.synced ?? false,
+          timestamp: new Date().toISOString(),
+          timestampIST: nowIST,
+          error: sheetResult?.error
+        };
+      } catch (sheetErr: any) {
+        console.warn('[GoogleSheet] Non-blocking sync error:', sheetErr);
+        existing.googleSheetSync = {
+          synced: false,
+          timestamp: new Date().toISOString(),
+          timestampIST: nowIST,
+          error: sheetErr.message || 'Sheet sync error'
+        };
+      }
     }
 
     saveBooking(existing);
