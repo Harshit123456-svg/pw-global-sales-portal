@@ -499,7 +499,7 @@ async function dispatchEmail(recipients: string[], subject: string, html: string
         })
       });
       const data = await res.json().catch(() => null);
-      if (data && (data.result === 'success' || data.action === 'email_sent')) {
+      if (data && data.action === 'email_sent') {
         return {
           success: true,
           recipients,
@@ -507,22 +507,25 @@ async function dispatchEmail(recipients: string[], subject: string, html: string
           simulated: false
         };
       }
+      if (data && data.result === 'success') {
+        console.warn('[EmailService] Google Apps Script is active for Google Sheets, but requires an update to enable automatic MailApp.sendEmail.');
+      }
     } catch (err) {
       console.warn('[EmailService] Apps Script webhook notice:', err);
     }
   }
 
-  console.log('--- PW GLOBAL EMAIL DISPATCH (SIMULATED: CONFIGURE SMTP IN SETTINGS) ---');
+  console.log('--- PW GLOBAL EMAIL DISPATCH (UNCONFIGURED: CONFIGURE SMTP OR UPDATE APPS SCRIPT) ---');
   console.log(`Recipients: ${recipients.join(', ')}`);
   console.log(`Subject: ${subject}`);
-  console.log('------------------------------------------------------------------------');
+  console.log('-------------------------------------------------------------------------------------');
 
   return {
-    success: true,
+    success: false,
     recipients,
     html,
     simulated: true,
-    errors: ['SMTP not configured yet. Configure in Settings or .env.local to send live emails to parent inboxes.']
+    errors: ['Live email delivery unconfigured. Configure SMTP in Settings or update your Google Apps Script to enable automatic parent email delivery.']
   };
 }
 

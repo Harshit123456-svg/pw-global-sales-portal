@@ -416,16 +416,16 @@ export default function HomePage() {
               <div className="space-y-5">
                 <div>
                   <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-1">
-                    Where is the Google Sheet &amp; How Does it Sort?
+                    Google Sheet Sync &amp; Automatic Email Dispatch (All-in-One)
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    The Google Sheet is created directly in <strong>your Google Drive</strong> so your organization maintains 100% data ownership. Every submission is formatted in <strong>Indian Standard Time (IST)</strong> and automatically inserted at the top of the sheet so the newest admissions are always first!
+                    This single Google Apps Script handles <strong>BOTH</strong> live Google Sheet record syncing (IST formatted &amp; newest on top) and <strong>free, automated email delivery</strong> (Parent 4-digit OTPs &amp; signed admission receipts) using your Google account with <strong>zero SMTP credentials required</strong>!
                   </p>
                 </div>
 
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2.5">
                   <div className="font-bold text-slate-800 flex items-center gap-2">
-                    <span>How to Create Your Google Sheet (60 Seconds):</span>
+                    <span>How to Setup or Update Your Google Apps Script:</span>
                     <a
                       href="https://sheets.new"
                       target="_blank"
@@ -436,17 +436,15 @@ export default function HomePage() {
                     </a>
                   </div>
                   <ol className="list-decimal list-inside space-y-1.5 text-slate-600 text-[11.5px]">
-                    <li>Open a new Google Sheet at <a href="https://sheets.new" target="_blank" rel="noreferrer" className="underline font-bold text-indigo-600">sheets.new</a> and name it <strong>&ldquo;PW Global - Admissions Master Sheet&rdquo;</strong>.</li>
-                    <li>In the top menu, click <strong>Extensions &rarr; Apps Script</strong>.</li>
-                    <li>Click the copy button below and paste the code into the script editor.</li>
-                    <li>Click <strong>Deploy &rarr; New deployment</strong>:
-                      <ul className="list-disc list-inside ml-4 mt-0.5 text-slate-500">
-                        <li>Type: <strong>Web app</strong></li>
-                        <li>Execute as: <strong>Me</strong></li>
-                        <li>Who has access: <strong>Anyone</strong></li>
-                      </ul>
+                    <li>In your Google Sheet, click <strong>Extensions &rarr; Apps Script</strong>.</li>
+                    <li>Click <strong>Copy Google Apps Script Code</strong> below, select all existing text in the editor, delete it, and paste this updated code.</li>
+                    <li>
+                      <strong>If updating an existing deployment:</strong> Click <strong>Deploy &rarr; Manage deployments</strong> &rarr; click the <strong>Pencil icon (Edit)</strong> &rarr; under <strong>Version</strong> select <strong>New version</strong> &rarr; click <strong>Deploy</strong>.
                     </li>
-                    <li>Click <strong>Deploy</strong>, copy the <strong>Web App URL</strong>, paste it below, and click <strong>Test Google Sheet Connection</strong>!</li>
+                    <li>
+                      <strong>If deploying for the first time:</strong> Click <strong>Deploy &rarr; New deployment</strong> &rarr; select <strong>Web app</strong> &rarr; Execute as: <strong>Me</strong> &rarr; Who has access: <strong>Anyone</strong> &rarr; click <strong>Deploy</strong>.
+                    </li>
+                    <li>Authorize access when prompted by Google, copy the <strong>Web App URL</strong> (ending in <code className="text-indigo-600 font-mono">/exec</code>), paste it below, and click <strong>Test Google Sheet Connection</strong>!</li>
                   </ol>
 
                   <div className="pt-2">

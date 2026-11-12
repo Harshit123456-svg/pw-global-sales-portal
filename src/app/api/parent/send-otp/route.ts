@@ -47,13 +47,18 @@ export async function POST(req: NextRequest) {
 
     // Send 4-digit OTP email to parent
     const emailResult = await sendParentOtpEmail(booking, otp);
+    const isLiveDelivered = emailResult.success && !emailResult.simulated;
 
     return NextResponse.json({
       success: true,
       maskedEmail: maskEmail(parentEmail),
       challengeToken,
       expiresAt,
-      emailStatus: emailResult.simulated ? 'simulated' : 'dispatched'
+      emailStatus: isLiveDelivered ? 'dispatched' : 'unconfigured',
+      fallbackOtp: !isLiveDelivered ? otp : undefined,
+      emailNotice: !isLiveDelivered
+        ? 'Live parent email delivery is currently unconfigured. To send emails automatically, please update your Google Apps Script or enter SMTP in Settings.'
+        : undefined
     });
   } catch (err: any) {
     console.error('[send-otp error]:', err);

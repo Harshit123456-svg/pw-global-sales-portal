@@ -79,6 +79,8 @@ export default function ParentOnboardingPage() {
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [unlockToken, setUnlockToken] = useState<string | null>(null);
   const [maskedEmail, setMaskedEmail] = useState<string>('');
+  const [fallbackOtp, setFallbackOtp] = useState<string | null>(null);
+  const [emailNotice, setEmailNotice] = useState<string | null>(null);
   const hasAutoSentRef = useRef(false);
 
   const populateForm = useCallback((b: BookingRecord) => {
@@ -216,8 +218,17 @@ export default function ParentOnboardingPage() {
       setOtpSent(true);
       if (data.maskedEmail) setMaskedEmail(data.maskedEmail);
       if (data.challengeToken) setChallengeToken(data.challengeToken);
-      setOtpCooldown(45);
-      setOtpSuccessMsg(`A 4-digit verification code has been dispatched to ${data.maskedEmail || maskClientEmail(targetBooking.student.parentEmail)}. Please check your inbox & spam folder.`);
+      if (data.fallbackOtp) setFallbackOtp(data.fallbackOtp);
+      if (data.emailNotice) setEmailNotice(data.emailNotice);
+      setOtpCooldown(30);
+
+      if (data.emailStatus === 'unconfigured') {
+        setOtpSuccessMsg(`Notice: Automatic email delivery is unconfigured. For testing / immediate entry, your 4-digit code is shown below.`);
+      } else {
+        setFallbackOtp(null);
+        setEmailNotice(null);
+        setOtpSuccessMsg(`A 4-digit verification code has been dispatched to ${data.maskedEmail || maskClientEmail(targetBooking.student.parentEmail)}. Please check your inbox & spam folder.`);
+      }
     } catch (err: any) {
       setOtpError(err.message || 'Unable to send verification code. Please check your network connection.');
     } finally {
@@ -676,6 +687,26 @@ export default function ParentOnboardingPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Emergency / Unconfigured Email Fallback Box */}
+              {fallbackOtp && (
+                <div className="p-4 bg-amber-50 border-2 border-dashed border-amber-300 rounded-2xl text-center space-y-2 animate-fade-in">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 uppercase tracking-wide">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Email Delivery Unconfigured — Verification Code</span>
+                  </div>
+                  <p className="text-xs text-amber-950 leading-relaxed max-w-md mx-auto">
+                    Live email delivery to <strong>{maskedEmail}</strong> is currently unconfigured because SMTP or the updated Google Apps Script email webhook has not been activated yet.
+                  </p>
+                  <div className="bg-white border border-amber-300 rounded-xl p-3 inline-block mx-auto px-6 shadow-xs">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your 4-Digit Security Code</div>
+                    <div className="text-3xl font-black font-mono tracking-widest text-indigo-950 mt-0.5">{fallbackOtp}</div>
+                  </div>
+                  <div className="text-[11px] text-amber-800">
+                    Enter <strong>{fallbackOtp}</strong> in the boxes above to continue. To enable automated email delivery to parent inboxes, update your Google Apps Script in the portal settings.
+                  </div>
+                </div>
+              )}
 
               {/* Counsellor Restriction Warning */}
               <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-3">

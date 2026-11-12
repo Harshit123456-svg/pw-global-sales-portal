@@ -38,7 +38,6 @@ function doGet(e) {
 
 function doPost(e) {
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = {};
     
     if (e.postData && e.postData.contents) {
@@ -46,6 +45,26 @@ function doPost(e) {
     } else if (e.parameter) {
       data = e.parameter;
     }
+
+    // 1. ACTION: DISPATCH EMAIL (Parent OTP Code & Signed Admission Confirmation)
+    if (data.action === "send_email" || data.action === "send_otp") {
+      var recipients = Array.isArray(data.recipients) ? data.recipients.join(",") : (data.recipients || data.to || "");
+      if (recipients) {
+        MailApp.sendEmail({
+          to: recipients,
+          subject: data.subject || "PhysicsWallah Global - Admission Verification",
+          htmlBody: data.html || data.body || "",
+          name: "PhysicsWallah Global Admissions"
+        });
+        return ContentService.createTextOutput(JSON.stringify({ 
+          result: "success", 
+          action: "email_sent", 
+          recipients: recipients 
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
     // Auto-create header row if sheet is empty
     if (sheet.getLastRow() === 0) {
