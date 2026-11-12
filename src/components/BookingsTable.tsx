@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Search, Download, Mail, Trash2, CheckCircle2, Clock, 
   RefreshCw, FileText, Share2, Sheet, AlertCircle, ArrowUpRight, 
-  Smartphone, Monitor, ShieldCheck, ShieldAlert 
+  Smartphone, Monitor, ShieldCheck, ShieldAlert, Copy, Check 
 } from 'lucide-react';
 import { BookingRecord } from '@/lib/types';
 import { formatToIST } from '@/lib/timeUtils';
@@ -24,6 +24,17 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({
   const [auditFilter, setAuditFilter] = useState<'all' | 'genuine' | 'same_device'>('all');
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [syncingAll, setSyncingAll] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyLink = (b: BookingRecord) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = b.token && b.token.startsWith('tok_')
+      ? `${origin}/parent/${b.id}?t=${b.token}`
+      : `${origin}/parent/${b.token || b.id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(b.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   // Filtered Bookings
   const filteredBookings = useMemo(() => {
@@ -562,17 +573,16 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({
                             <FileText className="w-4 h-4" />
                           </a>
 
-                          {/* Share link if pending */}
+                          {/* Copy secure parent signing link */}
                           {b.status === 'pending_parent_fill' && (
-                            <a
-                              href={b.token && b.token.startsWith('tok_') ? `/parent/${b.id}?t=${b.token}` : `/parent/${b.token || b.id}`}
-                              target="_blank"
-                              rel="noreferrer"
+                            <button
+                              type="button"
+                              onClick={() => handleCopyLink(b)}
                               className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                              title="Open Parent Link"
+                              title="Copy Parent Signing Link (Protected by Parent OTP)"
                             >
-                              <Share2 className="w-4 h-4" />
-                            </a>
+                              {copiedId === b.id ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
+                            </button>
                           )}
 
                           {/* Resend email */}

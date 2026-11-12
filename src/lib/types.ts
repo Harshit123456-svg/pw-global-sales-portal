@@ -67,6 +67,14 @@ export interface AuditTrail {
   auditNotes?: string;
 }
 
+export interface ParentOtpDetails {
+  code: string; // 4-digit code e.g. "4829"
+  expiresAt: string; // ISO timestamp
+  verified: boolean;
+  sentAt?: string;
+  attempts?: number;
+}
+
 export interface BookingRecord {
   id: string; // e.g. PWG-2026-XXXX
   token: string; // shareable token for parent link
@@ -83,6 +91,7 @@ export interface BookingRecord {
   student: StudentDetails;
   terms: TermsAgreement;
   audit: AuditTrail;
+  parentOtp?: ParentOtpDetails;
   emailsSent: {
     student: boolean;
     parent: boolean;

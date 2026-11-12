@@ -365,6 +365,81 @@ function generateParentSigningInviteHtml(booking: BookingRecord, signingUrl: str
   `;
 }
 
+// 3. PARENT OTP VERIFICATION EMAIL (Sent exclusively to parent to unlock admission form)
+function generateParentOtpHtml(booking: BookingRecord, otp: string): string {
+  const { student, id } = booking;
+  const batchName = booking.program?.productEnrolled || booking.batchName;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Your 4-Digit Parent Verification Code: ${otp}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0; }
+    .header { background: #ffffff; padding: 26px 30px; text-align: center; border-bottom: 3px solid #4f46e5; }
+    .header img { max-height: 48px; width: auto; margin-bottom: 8px; }
+    .header h1 { margin: 6px 0 2px 0; font-size: 19px; font-weight: 800; color: #0f172a; }
+    .content { padding: 30px; }
+    .otp-card { background: #f8fafc; border: 2px dashed #4f46e5; border-radius: 14px; padding: 24px; text-align: center; margin: 22px 0; }
+    .otp-code { font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #1e1b4b; margin: 14px 0; font-family: monospace; }
+    .security-box { background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; padding: 16px; font-size: 13px; color: #991b1b; line-height: 1.5; margin-bottom: 20px; }
+    .footer { background: #f8fafc; padding: 20px 30px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="${PW_GLOBAL_LOGO_BASE64}" alt="PhysicsWallah Global" />
+      <h1>PHYSICS WALLAH GLOBAL</h1>
+      <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; margin-top: 4px;">
+        Parent Identity Verification &bull; Secure Admission Access
+      </div>
+    </div>
+
+    <div class="content">
+      <h2 style="color: #0f172a; margin-top: 0; font-size: 17px;">
+        Dear ${student.fatherName || 'Parent / Legal Guardian'},
+      </h2>
+      <p style="font-size: 13.5px; color: #475569; line-height: 1.5;">
+        You have requested access to review and digitally sign the official student onboarding &amp; admission document for <strong>${student.name || 'your student'}</strong> in <strong>${batchName}</strong> (Ref: <strong style="font-family: monospace;">${id}</strong>).
+      </p>
+
+      <div class="otp-card">
+        <div style="font-size: 12px; font-weight: 700; color: #4338ca; text-transform: uppercase; letter-spacing: 1px;">
+          Your 4-Digit Security Code (OTP)
+        </div>
+        <div class="otp-code">
+          ${otp}
+        </div>
+        <div style="font-size: 12px; color: #64748b;">
+          Valid for 15 minutes &bull; Single-use only
+        </div>
+      </div>
+
+      <div class="security-box">
+        <strong>🔒 Strict Legal &amp; Compliance Requirement:</strong><br>
+        To ensure genuine parent authorization, only the student&apos;s parent or legal guardian is legally permitted to access, review, and digitally sign this document.<br><br>
+        <strong>DO NOT share this code with anyone, including your sales counsellor.</strong> If anyone asks you to share this code, please contact PhysicsWallah Global at <strong>pwglobal_support@pw.live</strong> immediately.
+      </div>
+
+      <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-bottom: 0;">
+        Enter this 4-digit code on the verification screen to unlock the admission onboarding form. If you did not request this, please ignore this email.
+      </p>
+    </div>
+
+    <div class="footer">
+      <div>&copy; ${new Date().getFullYear()} <strong>PhysicsWallah Global (PW Global)</strong>. All Rights Reserved.</div>
+      <div style="margin-top: 4px; font-size: 11px;">Physicswallah Limited &bull; Institutional Admissions Security</div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
 // Helper: Dispatches email to recipient list
 async function dispatchEmail(recipients: string[], subject: string, html: string) {
   const settings = getSettings();
@@ -406,6 +481,34 @@ async function dispatchEmail(recipients: string[], subject: string, html: string
     } catch (err: any) {
       console.error('SMTP sending error:', err);
       return { success: false, recipients, html, errors: [err.message], simulated: false };
+    }
+  }
+
+  // Fallback: If SMTP is not set, try Google Apps Script Webhook
+  const webhookUrl = settings.googleSheetWebhookUrl;
+  if (webhookUrl && webhookUrl.startsWith('http') && !webhookUrl.includes('/dev')) {
+    try {
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'send_email',
+          recipients,
+          subject,
+          html
+        })
+      });
+      const data = await res.json().catch(() => null);
+      if (data && (data.result === 'success' || data.action === 'email_sent')) {
+        return {
+          success: true,
+          recipients,
+          html,
+          simulated: false
+        };
+      }
+    } catch (err) {
+      console.warn('[EmailService] Apps Script webhook notice:', err);
     }
   }
 
@@ -456,4 +559,19 @@ export async function sendEnrollmentEmails(booking: BookingRecord) {
   return dispatchEmail(recipients, subject, html);
 }
 
-export { generateEmailHtml, generateParentSigningInviteHtml };
+// Export 3: Send Parent 4-Digit Security OTP (Exclusively to parent email to unlock admission form)
+export async function sendParentOtpEmail(booking: BookingRecord, otp: string) {
+  const parentEmail = (booking.student?.parentEmail || '').trim().toLowerCase();
+  if (!parentEmail) {
+    return { success: false, errors: ['Parent Email address is missing in booking.'], simulated: false };
+  }
+
+  // STRICT SECURITY: OTP is sent ONLY to the parent, never to counsellor
+  const recipients = [parentEmail];
+  const subject = `🔐 [PW Global Security] 4-Digit Parent Verification Code: ${otp} (Ref: ${booking.id})`;
+  const html = generateParentOtpHtml(booking, otp);
+
+  return dispatchEmail(recipients, subject, html);
+}
+
+export { generateEmailHtml, generateParentSigningInviteHtml, generateParentOtpHtml };

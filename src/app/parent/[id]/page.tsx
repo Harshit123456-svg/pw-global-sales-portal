@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { PWLogo } from '@/components/PWLogo';
 import { 
   CheckCircle2, ShieldAlert, Upload, X, AlertCircle, 
   Send, FileCheck, ArrowRight, ArrowLeft, BookOpen, Clock, 
-  FileText, CheckSquare, Square
+  FileText, CheckSquare, Square, Lock, KeyRound, ShieldCheck,
+  RefreshCw, Mail, UserCheck
 } from 'lucide-react';
 import { GRADES, TARGET_EXAM_MONTHS, COUNTRIES, ADMISSION_TERMS_AND_CONDITIONS } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
@@ -14,6 +15,20 @@ import { PhoneInput } from '@/components/PhoneInput';
 import { decodeBookingToken } from '@/lib/tokenUtils';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
+
+function maskClientEmail(email: string): string {
+  if (!email || !email.includes('@')) return 'your registered email';
+  const parts = email.trim().toLowerCase().split('@');
+  const local = parts[0];
+  const domain = parts.slice(1).join('@');
+  if (local.length <= 2) {
+    return `${local[0]}*@${domain}`;
+  }
+  const first = local.slice(0, 2);
+  const last = local.slice(-1);
+  const stars = '*'.repeat(Math.min(5, Math.max(3, local.length - 3)));
+  return `${first}${stars}${last}@${domain}`;
+}
 
 export default function ParentOnboardingPage() {
   const params = useParams();
@@ -51,6 +66,20 @@ export default function ParentOnboardingPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+
+  // Parent OTP Security Gate State
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [otpCode, setOtpCode] = useState(['', '', '', '']);
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState<string | null>(null);
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [unlockToken, setUnlockToken] = useState<string | null>(null);
+  const [maskedEmail, setMaskedEmail] = useState<string>('');
+  const hasAutoSentRef = useRef(false);
 
   const populateForm = useCallback((b: BookingRecord) => {
     if (b.student.name) setStudentName(b.student.name);
@@ -124,6 +153,163 @@ export default function ParentOnboardingPage() {
       loadData();
     }
   }, [idOrToken, tokenFromQuery, populateForm]);
+
+  // Handle session unlock check & auto-trigger 4-digit OTP dispatch on load
+  useEffect(() => {
+    if (!booking) return;
+
+    if (booking.student?.parentEmail) {
+      setMaskedEmail(maskClientEmail(booking.student.parentEmail));
+    }
+
+    if (booking.status === 'completed') {
+      setIsUnlocked(true);
+      return;
+    }
+
+    // Check if session has previously verified unlock token
+    try {
+      const stored = sessionStorage.getItem(`pw_unlock_${booking.id}`);
+      if (stored) {
+        setUnlockToken(stored);
+        setIsUnlocked(true);
+        return;
+      }
+    } catch (e) {
+      // sessionStorage not accessible
+    }
+
+    // Auto send 4-digit code to parent email on initial load
+    if (!hasAutoSentRef.current && !isUnlocked) {
+      hasAutoSentRef.current = true;
+      triggerSendOtp(booking, true);
+    }
+  }, [booking, isUnlocked]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setOtpCooldown(c => Math.max(0, c - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [otpCooldown]);
+
+  const triggerSendOtp = async (targetBooking: BookingRecord, isAuto = false) => {
+    setOtpSending(true);
+    setOtpError(null);
+    if (!isAuto) setOtpSuccessMsg(null);
+
+    try {
+      const res = await fetch('/api/parent/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: targetBooking.id,
+          token: targetBooking.token || (idOrToken.startsWith('tok_') ? idOrToken : '')
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to dispatch verification code to parent email.');
+      }
+      setOtpSent(true);
+      if (data.maskedEmail) setMaskedEmail(data.maskedEmail);
+      if (data.challengeToken) setChallengeToken(data.challengeToken);
+      setOtpCooldown(45);
+      setOtpSuccessMsg(`A 4-digit verification code has been dispatched to ${data.maskedEmail || maskClientEmail(targetBooking.student.parentEmail)}. Please check your inbox & spam folder.`);
+    } catch (err: any) {
+      setOtpError(err.message || 'Unable to send verification code. Please check your network connection.');
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async (overrideCode?: string) => {
+    const fullCode = (overrideCode || otpCode.join('')).trim();
+    if (fullCode.length !== 4) {
+      setOtpError('Please enter the full 4-digit numeric code.');
+      return;
+    }
+    if (!booking) return;
+
+    setOtpVerifying(true);
+    setOtpError(null);
+
+    try {
+      const res = await fetch('/api/parent/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          token: booking.token || (idOrToken.startsWith('tok_') ? idOrToken : ''),
+          enteredOtp: fullCode,
+          challengeToken
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Incorrect verification code. Please check your parent email inbox.');
+      }
+
+      const verifiedToken = data.unlockToken || 'verified';
+      setUnlockToken(verifiedToken);
+      setIsUnlocked(true);
+
+      try {
+        sessionStorage.setItem(`pw_unlock_${booking.id}`, verifiedToken);
+      } catch (e) {
+        // Ignored in private/storage restricted mode
+      }
+    } catch (err: any) {
+      setOtpError(err.message || 'Verification failed. Please check the code.');
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
+  const handleDigitChange = (index: number, value: string) => {
+    const digitsOnly = value.replace(/\D/g, '');
+    if (digitsOnly.length > 1) {
+      const newDigits = [...otpCode];
+      const chars = digitsOnly.slice(0, 4).split('');
+      chars.forEach((c, i) => {
+        if (index + i < 4) newDigits[index + i] = c;
+      });
+      setOtpCode(newDigits);
+      const nextIndex = Math.min(3, index + chars.length);
+      const nextInput = document.getElementById(`otp-input-${nextIndex}`);
+      nextInput?.focus();
+      if (newDigits.join('').length === 4) {
+        handleVerifyOtp(newDigits.join(''));
+      }
+      return;
+    }
+
+    const newDigits = [...otpCode];
+    newDigits[index] = digitsOnly;
+    setOtpCode(newDigits);
+
+    if (digitsOnly && index < 3) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      nextInput?.focus();
+    }
+
+    if (digitsOnly && index === 3) {
+      const full = [...newDigits.slice(0, 3), digitsOnly].join('');
+      if (full.length === 4) {
+        handleVerifyOtp(full);
+      }
+    }
+  };
+
+  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-input-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -245,6 +431,7 @@ export default function ParentOnboardingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...payload,
+          unlockToken,
           originalBooking: booking,
           token: booking?.token || (idOrToken.startsWith('tok_') ? idOrToken : '')
         })
@@ -359,8 +546,171 @@ export default function ParentOnboardingPage() {
               </div>
             </div>
           </div>
+        ) : !isUnlocked ? (
+          /* PARENT OTP VERIFICATION GATE */
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden my-4 max-w-2xl mx-auto animate-fade-in">
+            {/* Header Security Banner */}
+            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-7 text-white text-center border-b border-indigo-900">
+              <div className="w-16 h-16 bg-indigo-600/30 border border-indigo-400/40 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <Lock className="w-8 h-8 text-indigo-300" />
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-[11px] font-bold uppercase tracking-wider mb-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Parent Identity Verification Gate</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Parent Verification Required</h1>
+              <p className="text-slate-300 text-xs sm:text-sm mt-1.5 max-w-md mx-auto leading-relaxed">
+                For student privacy and genuine legal admission authorization, this document can only be accessed and signed by the parent or legal guardian.
+              </p>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              {/* Enrollment Summary */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Student Enrollment</div>
+                  <div className="text-sm font-bold text-slate-900">{booking.student.name || 'Enrolled Student'}</div>
+                  <div className="text-xs text-indigo-600 font-semibold mt-0.5">{batchName}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Admission Ref</div>
+                  <div className="font-mono text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                    {booking.id}
+                  </div>
+                </div>
+              </div>
+
+              {/* Destination Email Info */}
+              <div className="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-4 text-center space-y-1.5">
+                <div className="inline-flex items-center gap-2 text-indigo-950 text-xs font-bold">
+                  <Mail className="w-4 h-4 text-indigo-600" />
+                  <span>4-Digit Verification Code Sent Directly To:</span>
+                </div>
+                <div className="font-mono text-base font-extrabold text-indigo-950 tracking-wider">
+                  {maskedEmail || maskClientEmail(booking.student.parentEmail)}
+                </div>
+                <p className="text-[11px] text-indigo-900/80 leading-normal">
+                  Please check your personal inbox and spam folder for the 4-digit code.
+                </p>
+              </div>
+
+              {/* OTP Form */}
+              <div className="space-y-5 pt-1">
+                <div className="text-center">
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
+                    Enter 4-Digit Security Code
+                  </label>
+                  
+                  {/* 4 Large Digit Input Boxes */}
+                  <div className="flex items-center justify-center gap-3">
+                    {[0, 1, 2, 3].map((idx) => (
+                      <input
+                        key={idx}
+                        id={`otp-input-${idx}`}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={1}
+                        value={otpCode[idx]}
+                        onChange={(e) => handleDigitChange(idx, e.target.value)}
+                        onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                        className="w-14 h-16 sm:w-16 sm:h-18 text-center text-2xl sm:text-3xl font-black font-mono bg-slate-50 border-2 border-slate-300 rounded-2xl text-slate-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 outline-none transition"
+                        autoFocus={idx === 0}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {otpError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700 text-center">
+                    {otpError}
+                  </div>
+                )}
+
+                {otpSuccessMsg && !otpError && (
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-800 text-center">
+                    {otpSuccessMsg}
+                  </div>
+                )}
+
+                {/* Unlock Button */}
+                <button
+                  type="button"
+                  onClick={() => handleVerifyOtp()}
+                  disabled={otpVerifying || otpCode.join('').length !== 4}
+                  className={`w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-lg flex items-center justify-center gap-2 transition ${
+                    otpVerifying || otpCode.join('').length !== 4
+                      ? 'bg-slate-400 cursor-not-allowed shadow-none'
+                      : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/30'
+                  }`}
+                >
+                  {otpVerifying ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Verifying Security Code...</span>
+                    </>
+                  ) : (
+                    <>
+                      <KeyRound className="w-4 h-4" />
+                      <span>Verify &amp; Unlock Admission Form</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Resend Action */}
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => triggerSendOtp(booking, false)}
+                    disabled={otpSending || otpCooldown > 0}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 disabled:text-slate-400 disabled:cursor-not-allowed inline-flex items-center gap-1.5 transition"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${otpSending ? 'animate-spin' : ''}`} />
+                    <span>
+                      {otpSending
+                        ? 'Sending code...'
+                        : otpCooldown > 0
+                        ? `Resend code in ${otpCooldown}s`
+                        : "Didn't receive code? Resend OTP"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Counsellor Restriction Warning */}
+              <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-950 leading-relaxed">
+                  <strong>Strict Policy Notice to Counsellors &amp; Staff:</strong>
+                  <p className="mt-0.5 text-amber-900">
+                    PhysicsWallah Global strictly prohibits sales counsellors or internal staff from opening, filling, or signing this form. The 4-digit OTP is sent exclusively to the parent&apos;s personal email and cannot be viewed in the portal. Any submission by a counsellor is an audit violation.
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-center text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                Need assistance? Contact PW Global Admissions Security at{' '}
+                <a href="mailto:pwglobal_support@pw.live" className="text-indigo-600 font-semibold underline">
+                  pwglobal_support@pw.live
+                </a>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="space-y-6">
+            
+            {/* Parent Verified Banner */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-emerald-900">
+                  Parent Identity Verified &bull; Authenticated via {maskedEmail || maskClientEmail(booking.student.parentEmail)}
+                </span>
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-200/70 text-emerald-800 px-2 py-0.5 rounded-md">
+                Authorized Session
+              </span>
+            </div>
             
             {/* Payment & Batch Summary Banner */}
             <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-800">

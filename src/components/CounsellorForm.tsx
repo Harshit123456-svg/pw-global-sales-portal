@@ -509,15 +509,15 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
                 </a>
               )}
 
-              <a
-                href={parentSigningUrl}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={handleCopyLink}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
+                title="Copy Parent Signing Link"
               >
-                <ExternalLink className="w-4 h-4" />
-                <span>Open Parent Form</span>
-              </a>
+                {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedLink ? 'Copied Link!' : 'Copy Parent Link'}</span>
+              </button>
             </div>
 
             <button

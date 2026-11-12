@@ -388,15 +388,15 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
               </a>
             )}
 
-            <a
-              href={getShareUrl()}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={handleCopy}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
+              title="Copy Parent Link to clipboard"
             >
-              <ExternalLink className="w-4 h-4" />
-              <span>Preview Parent View</span>
-            </a>
+              {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Copied Link!' : 'Copy Parent Link'}</span>
+            </button>
 
             <button
               type="button"

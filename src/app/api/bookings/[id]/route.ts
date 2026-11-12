@@ -3,6 +3,7 @@ import { getBookingById, saveBooking, deleteBooking } from '@/lib/storage';
 import { sendEnrollmentEmails } from '@/lib/emailService';
 import { syncBookingToGoogleSheet } from '@/lib/googleSheet';
 import { getNowIST } from '@/lib/timeUtils';
+import { verifyUnlockToken } from '@/lib/otpService';
 
 export async function GET(
   req: NextRequest,
@@ -16,16 +17,18 @@ export async function GET(
 
     const isTokenAccess = booking.token === params.id || req.nextUrl.searchParams.get('role') === 'parent';
     
-    // REQUIREMENT: Source of Lead should NOT be visible to parent link!
-    if (isTokenAccess) {
-      const sanitized = JSON.parse(JSON.stringify(booking));
-      if (sanitized.sales) {
-        delete sanitized.sales.sourceOfLead;
-      }
-      return NextResponse.json({ success: true, booking: sanitized });
+    // Always sanitize sensitive fields (OTP code must NEVER leak in API responses)
+    const sanitized = JSON.parse(JSON.stringify(booking));
+    if (sanitized.parentOtp) {
+      delete sanitized.parentOtp.code;
     }
 
-    return NextResponse.json({ success: true, booking });
+    // REQUIREMENT: Source of Lead should NOT be visible to parent link!
+    if (isTokenAccess && sanitized.sales) {
+      delete sanitized.sales.sourceOfLead;
+    }
+
+    return NextResponse.json({ success: true, booking: sanitized });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -54,6 +57,20 @@ export async function PUT(
     }
     const wasPending = existing.status === 'pending_parent_fill';
     const nowBecomingComplete = body.status === 'completed';
+
+    // REQUIREMENT: Security enforcement — parent must have verified OTP before admission can be confirmed
+    if (nowBecomingComplete && wasPending) {
+      const parentEmail = (existing.student?.parentEmail || body.student?.parentEmail || '').trim().toLowerCase();
+      const unlockToken = body.unlockToken;
+      const isVerified = existing.parentOtp?.verified || (unlockToken && verifyUnlockToken(existing.id, parentEmail, unlockToken));
+
+      if (!isVerified) {
+        return NextResponse.json({
+          success: false,
+          error: 'Parent OTP verification is strictly required before digitally signing and confirming admission.'
+        }, { status: 403 });
+      }
+    }
     const nowIST = getNowIST();
 
     // Capture parent device & network fingerprint for authenticity audit
