@@ -10,7 +10,11 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const booking = getBookingById(params.id);
+    const tokenQuery = req.nextUrl.searchParams.get('t');
+    let booking = getBookingById(params.id);
+    if (!booking && tokenQuery) {
+      booking = getBookingById(tokenQuery);
+    }
     if (!booking) {
       return NextResponse.json({ success: false, error: 'Booking not found' }, { status: 404 });
     }

@@ -30,7 +30,7 @@ function maskClientEmail(email: string): string {
   return `${first}${stars}${last}@${domain}`;
 }
 
-export default function ParentOnboardingPage() {
+function ParentOnboardingContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const idOrToken = (params?.id as string) || '';
@@ -109,14 +109,19 @@ export default function ParentOnboardingPage() {
         setLoading(true);
         setErrorMsg(null);
 
-        // 1. Check if token is present (either in query param ?t=tok_... or in path /parent/tok_...)
-        const candidateToken = tokenFromQuery.startsWith('tok_') 
-          ? tokenFromQuery 
+        // 1. Check if token is present (either in query param ?t=tok_... or ?token=tok_... or in path /parent/tok_...)
+        const rawToken = tokenFromQuery || searchParams?.get('token') || '';
+        const candidateToken = rawToken.startsWith('tok_') 
+          ? rawToken 
           : (idOrToken.startsWith('tok_') ? idOrToken : null);
 
         let localBooking: BookingRecord | null = null;
         if (candidateToken) {
-          localBooking = decodeBookingToken(candidateToken);
+          try {
+            localBooking = decodeBookingToken(candidateToken);
+          } catch (tokErr) {
+            console.warn('[ParentPage] Token decode error:', tokErr);
+          }
         }
 
         // If decoded locally, render immediately with 0ms network latency
@@ -127,22 +132,29 @@ export default function ParentOnboardingPage() {
         }
 
         // 2. Fetch server record using short clean ID to check for live updates/completion
-        const lookupId = localBooking?.id || (idOrToken.startsWith('tok_') ? '' : idOrToken);
+        const lookupId = localBooking?.id || (idOrToken && !idOrToken.startsWith('tok_') ? idOrToken : '');
         if (lookupId) {
           try {
-            const res = await fetch(`/api/bookings/${encodeURIComponent(lookupId)}?role=parent`);
+            const tokenQuery = candidateToken ? `&t=${encodeURIComponent(candidateToken)}` : '';
+            const res = await fetch(`/api/bookings/${encodeURIComponent(lookupId)}?role=parent${tokenQuery}`);
             if (res.ok) {
               const data = await res.json();
               if (data.success && data.booking) {
                 setBooking(data.booking);
                 populateForm(data.booking);
               }
+            } else if (!localBooking) {
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData.error || `Admission record '${lookupId}' was not found. Please contact your PW Global Sales Counsellor.`);
             }
-          } catch (e) {
-            console.log('[ParentPage] Running in self-contained mode:', e);
+          } catch (e: any) {
+            console.log('[ParentPage] Running in self-contained mode or fetch error:', e);
+            if (!localBooking) {
+              throw e;
+            }
           }
         } else if (!localBooking) {
-          throw new Error('Onboarding link not found or expired. Please contact your PW Global Sales Counsellor.');
+          throw new Error('Onboarding link is missing or expired. Please contact your PW Global Sales Counsellor.');
         }
       } catch (err: any) {
         setErrorMsg(err.message || 'Could not load enrollment details.');
@@ -151,10 +163,13 @@ export default function ParentOnboardingPage() {
       }
     }
 
-    if (idOrToken || tokenFromQuery) {
+    if (idOrToken || tokenFromQuery || searchParams?.get('token')) {
       loadData();
+    } else {
+      setLoading(false);
+      setErrorMsg('No enrollment ID provided in the link. Please verify the URL provided by your counsellor.');
     }
-  }, [idOrToken, tokenFromQuery, populateForm]);
+  }, [idOrToken, tokenFromQuery, searchParams, populateForm]);
 
   // Handle session unlock check & auto-trigger 4-digit OTP dispatch on load
   useEffect(() => {
@@ -208,7 +223,8 @@ export default function ParentOnboardingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bookingId: targetBooking.id,
-          token: targetBooking.token || (idOrToken.startsWith('tok_') ? idOrToken : '')
+          token: targetBooking.token || (idOrToken.startsWith('tok_') ? idOrToken : ''),
+          originalBooking: targetBooking
         })
       });
       const data = await res.json();
@@ -254,6 +270,7 @@ export default function ParentOnboardingPage() {
         body: JSON.stringify({
           bookingId: booking.id,
           token: booking.token || (idOrToken.startsWith('tok_') ? idOrToken : ''),
+          originalBooking: booking,
           enteredOtp: fullCode,
           challengeToken
         })
@@ -479,7 +496,7 @@ export default function ParentOnboardingPage() {
     );
   }
 
-  if (errorMsg && !booking) {
+  if (errorMsg || !booking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
         <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-200 text-center space-y-4">
@@ -488,17 +505,31 @@ export default function ParentOnboardingPage() {
           </div>
           <h2 className="text-xl font-bold text-slate-900">Enrollment Link Not Found</h2>
           <p className="text-xs text-slate-500 leading-relaxed">
-            {errorMsg}. Please contact your assigned PhysicsWallah Global Sales Counsellor to verify the link.
+            {errorMsg || 'Could not load enrollment details from this link. Please ask your assigned PhysicsWallah Global Sales Counsellor to reshare your link.'}
           </p>
+          <div className="pt-2 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+            >
+              Refresh Page
+            </button>
+            <a
+              href="mailto:pwglobal_support@pw.live"
+              className="text-xs text-indigo-600 font-semibold hover:underline"
+            >
+              Contact Support: pwglobal_support@pw.live
+            </a>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!booking) return null;
-
-  const currencySymbol = booking.payment.currency === 'INR' ? '₹' : booking.payment.currency === 'USD' ? '$' : booking.payment.currency === 'AED' ? 'AED' : booking.payment.currency;
-  const batchName = booking.program?.productEnrolled || booking.batchName;
+  const currency = booking?.payment?.currency || 'INR';
+  const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'AED' ? 'AED' : currency;
+  const batchName = booking?.program?.productEnrolled || booking?.batchName || 'PW Global SAT Programme';
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
@@ -528,7 +559,7 @@ export default function ParentOnboardingPage() {
               </span>
               <h1 className="text-2xl sm:text-3xl font-black">Enrolment Complete &amp; Dispatched!</h1>
               <p className="text-emerald-100 text-xs sm:text-sm mt-1 max-w-lg mx-auto">
-                Thank you! The student details and digitally signed admission terms for <strong>{booking.student.name || studentName}</strong> in <strong>{batchName}</strong> have been accepted.
+                Thank you! The student details and digitally signed admission terms for <strong>{booking?.student?.name || studentName}</strong> in <strong>{batchName}</strong> have been accepted.
               </p>
             </div>
 
@@ -539,16 +570,16 @@ export default function ParentOnboardingPage() {
                   <span>Copies Automatically Sent Directly to:</span>
                 </div>
                 <div className="text-xs text-emerald-950 space-y-1">
-                  <div>&bull; Parent Email: <strong>{booking.student.parentEmail || parentEmail}</strong></div>
-                  <div>&bull; Student Email (Portal Access): <strong>{booking.student.studentEmail || studentEmail}</strong></div>
-                  <div>&bull; Counsellor: <strong>{booking.sales?.counsellorEmail}</strong></div>
-                  <div>&bull; PW Global Support: <strong>{booking.supportEmailRecipient}</strong></div>
+                  <div>&bull; Parent Email: <strong>{booking?.student?.parentEmail || parentEmail}</strong></div>
+                  <div>&bull; Student Email (Portal Access): <strong>{booking?.student?.studentEmail || studentEmail}</strong></div>
+                  <div>&bull; Counsellor: <strong>{booking?.sales?.counsellorEmail || 'PW Global Admissions'}</strong></div>
+                  <div>&bull; PW Global Support: <strong>{booking?.supportEmailRecipient || 'pwglobal_support@pw.live'}</strong></div>
                 </div>
               </div>
 
               <div className="text-center pt-2">
                 <Link
-                  href={`/receipt/${booking.id}`}
+                  href={`/receipt/${booking?.id || ''}`}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition"
                 >
                   <FileCheck className="w-4 h-4" />
@@ -580,13 +611,13 @@ export default function ParentOnboardingPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] uppercase font-bold text-slate-400">Student Enrollment</div>
-                  <div className="text-sm font-bold text-slate-900">{booking.student.name || 'Enrolled Student'}</div>
+                  <div className="text-sm font-bold text-slate-900">{booking?.student?.name || 'Enrolled Student'}</div>
                   <div className="text-xs text-indigo-600 font-semibold mt-0.5">{batchName}</div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Admission Ref</div>
                   <div className="font-mono text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                    {booking.id}
+                    {booking?.id || ''}
                   </div>
                 </div>
               </div>
@@ -598,7 +629,7 @@ export default function ParentOnboardingPage() {
                   <span>4-Digit Verification Code Sent Directly To:</span>
                 </div>
                 <div className="font-mono text-base font-extrabold text-indigo-950 tracking-wider">
-                  {maskedEmail || maskClientEmail(booking.student.parentEmail)}
+                  {maskedEmail || maskClientEmail(booking?.student?.parentEmail || '')}
                 </div>
                 <p className="text-[11px] text-indigo-900/80 leading-normal">
                   Please check your personal inbox and spam folder for the 4-digit code.
@@ -735,7 +766,7 @@ export default function ParentOnboardingPage() {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span className="text-xs font-bold text-emerald-900">
-                  Parent Identity Verified &bull; Authenticated via {maskedEmail || maskClientEmail(booking.student.parentEmail)}
+                  Parent Identity Verified &bull; Authenticated via {maskedEmail || maskClientEmail(booking?.student?.parentEmail || '')}
                 </span>
               </div>
               <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-200/70 text-emerald-800 px-2 py-0.5 rounded-md">
@@ -763,25 +794,25 @@ export default function ParentOnboardingPage() {
                 <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
                   <span className="text-[10px] font-semibold text-slate-400 uppercase">Program Format</span>
                   <div className="text-xs font-bold text-white mt-0.5">
-                    {booking.program?.programSelection || 'Group'} 
-                    {booking.program?.groupHours ? ` (${booking.program.groupHours})` : ''}
+                    {booking?.program?.programSelection || 'Group'} 
+                    {booking?.program?.groupHours ? ` (${booking.program.groupHours})` : ''}
                   </div>
                 </div>
 
                 <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
                   <span className="text-[10px] font-semibold text-slate-400 uppercase">Fee Status</span>
                   <div className="text-xs font-bold mt-0.5">
-                    {booking.payment.fullAmountPaid === 'yes' ? (
-                      <span className="text-emerald-400">Paid in Full ({currencySymbol} {booking.payment.soldPrice.toLocaleString()})</span>
+                    {booking?.payment?.fullAmountPaid === 'yes' ? (
+                      <span className="text-emerald-400">Paid in Full ({currencySymbol} {Number(booking?.payment?.soldPrice || 0).toLocaleString()})</span>
                     ) : (
-                      <span className="text-amber-400">Due: {currencySymbol} {booking.payment.dueAmount.toLocaleString()}</span>
+                      <span className="text-amber-400">Due: {currencySymbol} {Number(booking?.payment?.dueAmount || 0).toLocaleString()}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
                   <span className="text-[10px] font-semibold text-slate-400 uppercase">Sales Counsellor</span>
-                  <div className="text-xs font-bold text-white mt-0.5 truncate">{booking.sales?.salesRepresentative}</div>
+                  <div className="text-xs font-bold text-white mt-0.5 truncate">{booking?.sales?.salesRepresentative || 'PW Global Admissions'}</div>
                 </div>
               </div>
             </div>
@@ -1176,5 +1207,73 @@ export default function ParentOnboardingPage() {
 
       </main>
     </div>
+  );
+}
+
+class ParentErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: any }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('[ParentPage] Uncaught error caught by ParentErrorBoundary:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+          <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-200 text-center space-y-4">
+            <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900">Unable to Display Form</h2>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              An unexpected display issue occurred while loading this page. Please click refresh below or open the link again.
+            </p>
+            <div className="pt-2 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+              >
+                Refresh Page
+              </button>
+              <a
+                href="mailto:pwglobal_support@pw.live"
+                className="text-xs text-indigo-600 font-semibold hover:underline"
+              >
+                Contact Support: pwglobal_support@pw.live
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function ParentOnboardingPage() {
+  return (
+    <ParentErrorBoundary>
+      <React.Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <div className="text-center space-y-3">
+              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="text-sm font-bold text-slate-700">Loading PW Global Onboarding Portal...</div>
+            </div>
+          </div>
+        }
+      >
+        <ParentOnboardingContent />
+      </React.Suspense>
+    </ParentErrorBoundary>
   );
 }

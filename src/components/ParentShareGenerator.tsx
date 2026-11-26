@@ -11,6 +11,7 @@ import {
 } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
 import { PhoneInput } from '@/components/PhoneInput';
+import { encodeBookingToken } from '@/lib/tokenUtils';
 
 interface ParentShareGeneratorProps {
   onCreated?: (booking: BookingRecord) => void;
@@ -245,11 +246,10 @@ export const ParentShareGenerator: React.FC<ParentShareGeneratorProps> = ({
   const getShareUrl = () => {
     if (!generatedBooking) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const token = generatedBooking.token || '';
-    if (token.startsWith('tok_')) {
-      return `${origin}/parent/${generatedBooking.id}?t=${token}`;
-    }
-    return `${origin}/parent/${token || generatedBooking.id}`;
+    const token = (generatedBooking.token && generatedBooking.token.startsWith('tok_'))
+      ? generatedBooking.token
+      : encodeBookingToken(generatedBooking);
+    return `${origin}/parent/${generatedBooking.id}?t=${token}`;
   };
 
   const handleCopy = () => {

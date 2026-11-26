@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { BookingRecord } from '@/lib/types';
 import { formatToIST } from '@/lib/timeUtils';
+import { encodeBookingToken } from '@/lib/tokenUtils';
 
 interface BookingsTableProps {
   bookings: BookingRecord[];
@@ -28,9 +29,8 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({
 
   const handleCopyLink = (b: BookingRecord) => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const url = b.token && b.token.startsWith('tok_')
-      ? `${origin}/parent/${b.id}?t=${b.token}`
-      : `${origin}/parent/${b.token || b.id}`;
+    const token = (b.token && b.token.startsWith('tok_')) ? b.token : encodeBookingToken(b);
+    const url = `${origin}/parent/${b.id}?t=${token}`;
     navigator.clipboard.writeText(url);
     setCopiedId(b.id);
     setTimeout(() => setCopiedId(null), 2000);

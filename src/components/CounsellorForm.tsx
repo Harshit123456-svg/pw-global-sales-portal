@@ -13,6 +13,7 @@ import {
 } from '@/lib/constants';
 import { BookingRecord } from '@/lib/types';
 import { PhoneInput } from '@/components/PhoneInput';
+import { encodeBookingToken } from '@/lib/tokenUtils';
 import confetti from 'canvas-confetti';
 
 interface CounsellorFormProps {
@@ -341,10 +342,10 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
 
       setCompletedBooking(data.booking);
       const hostOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-      const token = data.booking.token;
-      const shareUrl = token && token.startsWith('tok_')
-        ? `${hostOrigin}/parent/${data.booking.id}?t=${token}`
-        : `${hostOrigin}/parent/${token || data.booking.id}`;
+      const token = (data.booking.token && data.booking.token.startsWith('tok_'))
+        ? data.booking.token
+        : encodeBookingToken(data.booking);
+      const shareUrl = `${hostOrigin}/parent/${data.booking.id}?t=${token}`;
       setParentSigningUrl(shareUrl);
       if (onSuccess) onSuccess(data.booking);
 

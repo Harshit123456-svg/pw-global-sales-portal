@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
     if (!booking && body.token) {
       booking = decodeBookingToken(body.token);
     }
+    if (!booking && body.originalBooking) {
+      booking = body.originalBooking;
+    }
 
     if (!booking) {
       return NextResponse.json({ success: false, error: 'Booking record not found' }, { status: 404 });
