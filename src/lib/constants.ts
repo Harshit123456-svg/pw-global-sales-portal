@@ -67,19 +67,15 @@ export const GRADES = [
 ];
 
 export const TARGET_EXAM_MONTHS = [
-  'March 2025',
-  'May 2025',
-  'June 2025',
-  'August 2025',
-  'October 2025',
-  'November 2025',
-  'December 2025',
-  'March 2026',
-  'May 2026',
-  'June 2026',
-  'October 2026',
-  'December 2026',
-  'May 2027',
+  'December 5, 2026',
+  'March 6, 2027',
+  'May 1, 2027',
+  'June 5, 2027',
+  'August 28, 2027',
+  'September 18, 2027',
+  'October 2, 2027',
+  'November 6, 2027',
+  'December 4, 2027',
   'Not Decided / Flexible'
 ];
 

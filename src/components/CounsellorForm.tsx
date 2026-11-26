@@ -71,7 +71,7 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
   const [currentSchool, setCurrentSchool] = useState('');
   const [mockTestScore, setMockTestScore] = useState('');
   const [targetScore, setTargetScore] = useState('');
-  const [targetExamMonth, setTargetExamMonth] = useState(TARGET_EXAM_MONTHS[1]);
+  const [targetExamMonth, setTargetExamMonth] = useState(TARGET_EXAM_MONTHS[0]);
   const [targetSchool, setTargetSchool] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -907,6 +907,9 @@ export const CounsellorForm: React.FC<CounsellorFormProps> = ({
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-900"
             >
               {TARGET_EXAM_MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+              {targetExamMonth && !TARGET_EXAM_MONTHS.includes(targetExamMonth) && (
+                <option value={targetExamMonth}>{targetExamMonth}</option>
+              )}
             </select>
           </div>
 
